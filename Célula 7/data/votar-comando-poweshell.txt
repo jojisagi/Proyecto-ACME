@@ -1,4 +1,4 @@
-------------vote
+----voto unitario----
 
 $body = @{
     userID = "123"
@@ -11,7 +11,7 @@ Invoke-RestMethod -Uri "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/p
     -Body $body `
     -ContentType "application/json"
 
-__
+----50 votos----
 
 # Lista de 10 gadgets
 $gadgets = @(
@@ -58,10 +58,6 @@ for ($i = 1; $i -le 50; $i++) {
         Write-Host "Error al insertar voto $voteId por $userID para $($gadget.gadgetId): $_"
     }
 }
-
-
----------------------result
-Invoke-RestMethod -Uri "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/pro2/results" -Method GET
 
 
 
