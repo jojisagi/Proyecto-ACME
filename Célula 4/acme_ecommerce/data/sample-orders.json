@@ -1,0 +1,206 @@
+[
+  {
+    "orderId": "order-001",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2024-11-20T10:30:00Z",
+    "status": "DELIVERED",
+    "totalAmount": 299.99,
+    "paymentMethod": "credit_card",
+    "items": [
+      {"productId": "prod-101", "name": "Laptop HP 15", "quantity": 1, "price": 299.99}
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 123",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-002",
+    "customerId": "cust-002",
+    "customerName": "Juan Pérez",
+    "customerEmail": "juan.perez@email.com",
+    "orderDate": "2024-11-21T14:15:00Z",
+    "status": "SHIPPED",
+    "totalAmount": 89.50,
+    "paymentMethod": "paypal",
+    "items": [
+      {"productId": "prod-202", "name": "Mouse Inalámbrico", "quantity": 2, "price": 24.99},
+      {"productId": "prod-203", "name": "Teclado Mecánico", "quantity": 1, "price": 39.52}
+    ],
+    "shippingAddress": {
+      "street": "Av. Libertador 456",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-003",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2024-11-22T09:00:00Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 549.00,
+    "paymentMethod": "credit_card",
+    "items": [
+      {"productId": "prod-301", "name": "Monitor 27 pulgadas", "quantity": 1, "price": 349.00},
+      {"productId": "prod-302", "name": "Webcam HD", "quantity": 1, "price": 199.99}
+    ],
+    "shippingAddress": {
+      "street": "Plaza Mayor 789",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-004",
+    "customerId": "cust-004",
+    "customerName": "Carlos Rodríguez",
+    "customerEmail": "carlos.rodriguez@email.com",
+    "orderDate": "2024-11-22T11:30:00Z",
+    "status": "PENDING",
+    "totalAmount": 1299.99,
+    "paymentMethod": "credit_card",
+    "items": [
+      {"productId": "prod-401", "name": "MacBook Pro 14", "quantity": 1, "price": 1299.99}
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 321",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-005",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2024-11-23T08:45:00Z",
+    "status": "SHIPPED",
+    "totalAmount": 159.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {"productId": "prod-501", "name": "Auriculares Bluetooth", "quantity": 1, "price": 79.99},
+      {"productId": "prod-502", "name": "Funda Laptop", "quantity": 1, "price": 79.99}
+    ],
+    "shippingAddress": {
+      "street": "Paseo Gracia 654",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08002",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-006",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2024-11-23T16:20:00Z",
+    "status": "DELIVERED",
+    "totalAmount": 45.99,
+    "paymentMethod": "credit_card",
+    "items": [
+      {"productId": "prod-601", "name": "Cable USB-C", "quantity": 3, "price": 15.33}
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 123",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-007",
+    "customerId": "cust-006",
+    "customerName": "Pedro López",
+    "customerEmail": "pedro.lopez@email.com",
+    "orderDate": "2024-11-24T10:00:00Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 799.00,
+    "paymentMethod": "paypal",
+    "items": [
+      {"productId": "prod-701", "name": "Tablet Samsung", "quantity": 1, "price": 799.00}
+    ],
+    "shippingAddress": {
+      "street": "Ronda Norte 147",
+      "city": "Bilbao",
+      "state": "País Vasco",
+      "zipCode": "48001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-008",
+    "customerId": "cust-007",
+    "customerName": "Isabel Fernández",
+    "customerEmail": "isabel.fernandez@email.com",
+    "orderDate": "2024-11-24T13:30:00Z",
+    "status": "SHIPPED",
+    "totalAmount": 234.50,
+    "paymentMethod": "credit_card",
+    "items": [
+      {"productId": "prod-801", "name": "Impresora WiFi", "quantity": 1, "price": 189.99},
+      {"productId": "prod-802", "name": "Papel A4 (500 hojas)", "quantity": 2, "price": 22.25}
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 258",
+      "city": "Zaragoza",
+      "state": "Aragón",
+      "zipCode": "50001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-009",
+    "customerId": "cust-008",
+    "customerName": "Miguel Torres",
+    "customerEmail": "miguel.torres@email.com",
+    "orderDate": "2024-11-25T09:15:00Z",
+    "status": "PENDING",
+    "totalAmount": 399.99,
+    "paymentMethod": "credit_card",
+    "items": [
+      {"productId": "prod-901", "name": "Silla Gaming", "quantity": 1, "price": 399.99}
+    ],
+    "shippingAddress": {
+      "street": "Av. Constitución 369",
+      "city": "Málaga",
+      "state": "Andalucía",
+      "zipCode": "29001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-010",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2024-11-25T11:45:00Z",
+    "status": "DELIVERED",
+    "totalAmount": 129.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {"productId": "prod-1001", "name": "Disco Duro Externo 1TB", "quantity": 1, "price": 129.99}
+    ],
+    "shippingAddress": {
+      "street": "Plaza España 741",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    }
+  }
+]

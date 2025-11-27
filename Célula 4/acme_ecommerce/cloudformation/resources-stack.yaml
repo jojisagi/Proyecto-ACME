@@ -1,0 +1,353 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'E-commerce Application Resources'
+
+Parameters:
+  IAMStackName:
+    Type: String
+    Default: ecommerce-iam
+    Description: Name of the IAM stack to import roles from
+
+Resources:
+  # S3 Bucket para contenido estático
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'ecommerce-frontend-${AWS::AccountId}'
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub '${FrontendBucket.Arn}/*'
+
+  # DynamoDB Table para Orders
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Orders
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+        - AttributeName: customerId
+          AttributeType: S
+        - AttributeName: orderDate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: CustomerIndex
+          KeySchema:
+            - AttributeName: customerId
+              KeyType: HASH
+            - AttributeName: orderDate
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  # SQS Queue para procesamiento de órdenes
+  OrderProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: order-processing-queue
+      VisibilityTimeout: 300
+      MessageRetentionPeriod: 1209600
+      ReceiveMessageWaitTimeSeconds: 20
+
+  # SNS Topic para notificaciones
+  OrderNotificationsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: order-notifications
+      DisplayName: Order Notifications
+
+  # S3 Bucket para almacenar código Lambda
+  LambdaCodeBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'ecommerce-lambda-code-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+
+  # Lambda Function - App Server
+  AppServerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: app-server
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !ImportValue 
+        Fn::Sub: '${IAMStackName}-AppServerLambdaRoleArn'
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: app-server.zip
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref OrderProcessingQueue
+      Timeout: 30
+      MemorySize: 128
+
+  # Lambda Function - Process Order
+  ProcessOrderFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: process-order
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !ImportValue 
+        Fn::Sub: '${IAMStackName}-ProcessOrderLambdaRoleArn'
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: process-order.zip
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref OrderNotificationsTopic
+      Timeout: 30
+      MemorySize: 128
+
+  # API Gateway
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: ecommerce-api
+      Description: E-commerce API Gateway
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # API Gateway Resource - Orders
+  OrdersResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: orders
+
+  # API Gateway Resource - Single Order
+  OrderResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !Ref OrdersResource
+      PathPart: '{orderId}'
+
+  # API Gateway Method - POST /orders
+  PostOrderMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref OrdersResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AppServerFunction.Arn}/invocations'
+
+  # API Gateway Method - GET /orders
+  GetOrdersMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref OrdersResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AppServerFunction.Arn}/invocations'
+
+  # API Gateway Method - GET /orders/{orderId}
+  GetOrderMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref OrderResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AppServerFunction.Arn}/invocations'
+
+  # Lambda Permissions
+  AppServerLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AppServerFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*'
+
+  # API Gateway Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - PostOrderMethod
+      - GetOrdersMethod
+      - GetOrderMethod
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: prod
+
+  # Step Functions State Machine
+  OrderProcessingStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineName: order-processing-workflow
+      RoleArn: !ImportValue 
+        Fn::Sub: '${IAMStackName}-StepFunctionsRoleArn'
+      DefinitionString: !Sub |
+        {
+          "Comment": "Order Processing Workflow",
+          "StartAt": "ProcessPayment",
+          "States": {
+            "ProcessPayment": {
+              "Type": "Task",
+              "Resource": "${ProcessOrderFunction.Arn}",
+              "Parameters": {
+                "orderId.$": "$.orderId",
+                "action": "process_payment"
+              },
+              "Next": "ArrangeShipment",
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.ALL"],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "Catch": [
+                {
+                  "ErrorEquals": ["States.ALL"],
+                  "Next": "PaymentFailed"
+                }
+              ]
+            },
+            "ArrangeShipment": {
+              "Type": "Task",
+              "Resource": "${ProcessOrderFunction.Arn}",
+              "Parameters": {
+                "orderId.$": "$.orderId",
+                "action": "arrange_shipment"
+              },
+              "Next": "SendNotification",
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.ALL"],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ]
+            },
+            "SendNotification": {
+              "Type": "Task",
+              "Resource": "${ProcessOrderFunction.Arn}",
+              "Parameters": {
+                "orderId.$": "$.orderId",
+                "action": "send_notification"
+              },
+              "End": true
+            },
+            "PaymentFailed": {
+              "Type": "Fail",
+              "Error": "PaymentProcessingError",
+              "Cause": "Payment processing failed after retries"
+            }
+          }
+        }
+
+  # CloudFront Distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt FrontendBucket.DomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+          - Id: ApiOrigin
+            DomainName: !Sub '${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com'
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        CacheBehaviors:
+          - PathPattern: /api/*
+            TargetOriginId: ApiOrigin
+            ViewerProtocolPolicy: https-only
+            ForwardedValues:
+              QueryString: true
+              Headers:
+                - Authorization
+                - Content-Type
+              Cookies:
+                Forward: all
+            MinTTL: 0
+            DefaultTTL: 0
+            MaxTTL: 0
+
+Outputs:
+  ApiGatewayUrl:
+    Description: API Gateway URL
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod'
+
+  CloudFrontUrl:
+    Description: CloudFront Distribution URL
+    Value: !GetAtt CloudFrontDistribution.DomainName
+
+  FrontendBucketName:
+    Description: S3 Bucket for Frontend
+    Value: !Ref FrontendBucket
+
+  LambdaCodeBucketName:
+    Description: S3 Bucket for Lambda Code
+    Value: !Ref LambdaCodeBucket
+
+  OrdersTableName:
+    Description: DynamoDB Orders Table
+    Value: !Ref OrdersTable
+
+  QueueUrl:
+    Description: SQS Queue URL
+    Value: !Ref OrderProcessingQueue
+
+  SNSTopicArn:
+    Description: SNS Topic ARN
+    Value: !Ref OrderNotificationsTopic
+
+  StateMachineArn:
+    Description: Step Functions State Machine ARN
+    Value: !Ref OrderProcessingStateMachine

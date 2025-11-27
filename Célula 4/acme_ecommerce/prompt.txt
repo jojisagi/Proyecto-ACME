@@ -1,0 +1,76 @@
+Generar proyecto y codigo de Lambda, Step Function y IaC con CloudFormation de la siguiente especificacion de
+arquitectura.
+Caracteristicas de los artefactos de código:
+Lambdas usando Python 3
+Interfaz web de usuario usando ReactJS
+Plantillas Cloudformation en formato YAML. Separa en dos el stack. La plantilla IAM para aprovisonar roles y politicas requeridos. Otra plantilla para aprovisionar los demas elementos AWS de la arquitectura y que usen los roles definidos en la primera plantilla.
+Genera los datos requeridos para poblar la base de datos DynamoDB, 50 elementos mínimos
+Genera shell scripts que usen curl con payloads para probar al API Gateway
+
+Arquitectura AWS de E-commerce
+1. Componentes AWS Identificados
+Servicios de Entrega y Distribución
+CloudFront
+Tipo: Content Delivery Network (CDN)
+Ubicación: Borde de la red (Edge locations)
+Función: Caché y distribución de contenido
+Protocolo: HTTP/HTTPS
+Almacenamiento
+Amazon S3
+Tipo: Object Storage
+Contenido: Archivos estáticos (HTML, CSS, JS, imágenes)
+Características: Escalabilidad ilimitada, durabilidad 99.999999999%
+Integración: Origen de CloudFront
+API y Puerta de Entrada
+API Gateway
+Tipo: Servicio de gestión de APIs REST
+Función: Punto de entrada único para todas las solicitudes HTTP
+Características: Validación de tokens, throttling, CORS
+Protocolo: REST/HTTP
+Computación
+AWS Lambda
+Tipo: Computación sin servidor (Serverless)
+Funciones identificadas:
+App Server (servidor de aplicaciones)
+Process Order (procesamiento de órdenes)
+Características: Escalado automático, pago por uso
+Lenguajes: Python, Node.js, Java, etc.
+Bases de Datos
+Amazon DynamoDB
+Tipo: Base de datos NoSQL (clave-valor)
+Tabla: Orders (órdenes)
+Características: Escalado automático, latencia baja (<10ms)
+Modelo: Documento/Atributo
+Mensajería y Colas
+Amazon SQS (Simple Queue Service)
+
+Tipo: Cola de mensajes distribuida
+Función: Desacoplamiento de procesos
+Patrón: Procesamiento asincrónico de órdenes
+Características: Garantía de entrega, FIFO opcional
+Amazon SNS (Simple Notification Service)
+
+Tipo: Servicio de notificaciones pub/sub
+Función: Envío de correos electrónicos
+Destinos: Email, SMS, SQS, Lambda
+Patrón: Publicador-Suscriptor
+Orquestación
+AWS Step Functions
+Tipo: Servicio de orquestación de flujos de trabajo
+Función: Coordinación de procesos complejos
+Lenguaje: Amazon States Language (JSON)
+Características: Reintentos, manejo de errores, timeouts
+
+
+Conexiones Específicas
+Origen	Destino	Tipo	Protocolo	Descripción
+CloudFront	S3	Lectura	HTTPS	Obtiene contenido estático
+CloudFront	API Gateway	Proxy	HTTPS	Redirige solicitudes dinámicas
+API Gateway	Lambda	Invocación	JSON	Ejecuta función Lambda
+Lambda	DynamoDB	Query/Put	AWS SDK	Almacena/recupera órdenes
+Lambda	SQS	SendMessage	AWS SDK	Encola órdenes para procesamiento
+Lambda	Payment System	HTTP	HTTPS/REST	Procesa pagos
+Step Functions	SQS	ReceiveMessage	AWS SDK	Consume mensajes
+Step Functions	Shipment System	HTTP	HTTPS/REST	Solicita envío
+Step Functions	SNS	Publish	AWS SDK	Publica notificaciones
+SNS	Email	Notificación	SMTP	Envía confirmaciones

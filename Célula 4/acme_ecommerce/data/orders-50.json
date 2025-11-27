@@ -1,0 +1,1759 @@
+[
+  {
+    "orderId": "order-001",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2025-10-29T16:31:39.189615Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 1259.96,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 2,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 2,
+        "price": 599.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 863",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-10-29T17:31:39.189615Z",
+    "transactionId": "TXN-CEE4CFD5"
+  },
+  {
+    "orderId": "order-002",
+    "customerId": "cust-008",
+    "customerName": "Miguel Torres",
+    "customerEmail": "miguel.torres@email.com",
+    "orderDate": "2025-11-23T16:31:39.194108Z",
+    "status": "PENDING",
+    "totalAmount": 329.98,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 1,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-101",
+        "name": "Laptop HP 15",
+        "quantity": 1,
+        "price": 299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 98",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-003",
+    "customerId": "cust-006",
+    "customerName": "Pedro López",
+    "customerEmail": "pedro.lopez@email.com",
+    "orderDate": "2025-11-05T16:31:39.194156Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 2569.92,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-101",
+        "name": "Laptop HP 15",
+        "quantity": 1,
+        "price": 299.99
+      },
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 1,
+        "price": 79.99
+      },
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 3,
+        "price": 599.99
+      },
+      {
+        "productId": "prod-1001",
+        "name": "Router WiFi 6",
+        "quantity": 3,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 999",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-05T17:31:39.194156Z",
+    "transactionId": "TXN-C6D4EBF7"
+  },
+  {
+    "orderId": "order-004",
+    "customerId": "cust-002",
+    "customerName": "Juan Pérez",
+    "customerEmail": "juan.perez@email.com",
+    "orderDate": "2025-11-22T16:31:39.194229Z",
+    "status": "SHIPPED",
+    "totalAmount": 4649.94,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-901",
+        "name": "Silla Gaming",
+        "quantity": 2,
+        "price": 299.99
+      },
+      {
+        "productId": "prod-802",
+        "name": "Escáner Portátil",
+        "quantity": 1,
+        "price": 149.99
+      },
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 3,
+        "price": 1299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 754",
+      "city": "Zaragoza",
+      "state": "Aragón",
+      "zipCode": "50001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-22T17:31:39.194229Z",
+    "transactionId": "TXN-B2EC529D",
+    "shipmentDate": "2025-11-23T16:31:39.194229Z",
+    "trackingNumber": "TRACK-337613182196",
+    "estimatedDeliveryDays": 5
+  },
+  {
+    "orderId": "order-005",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-20T16:31:39.194294Z",
+    "status": "PENDING",
+    "totalAmount": 229.96,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 2,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 2,
+        "price": 24.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 577",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-006",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2025-11-06T16:31:39.194322Z",
+    "status": "PENDING",
+    "totalAmount": 944.93,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-702",
+        "name": "iPad Air",
+        "quantity": 1,
+        "price": 599.99
+      },
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 3,
+        "price": 24.99
+      },
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 1,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-203",
+        "name": "Webcam HD",
+        "quantity": 2,
+        "price": 89.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 340",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-007",
+    "customerId": "cust-008",
+    "customerName": "Miguel Torres",
+    "customerEmail": "miguel.torres@email.com",
+    "orderDate": "2025-11-24T16:31:39.194350Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 2629.89,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 3,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-102",
+        "name": "Laptop Dell Inspiron",
+        "quantity": 3,
+        "price": 449.99
+      },
+      {
+        "productId": "prod-701",
+        "name": "Tablet Samsung",
+        "quantity": 2,
+        "price": 399.99
+      },
+      {
+        "productId": "prod-1001",
+        "name": "Router WiFi 6",
+        "quantity": 3,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Norte 571",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-24T17:31:39.194350Z",
+    "transactionId": "TXN-FEA63E29"
+  },
+  {
+    "orderId": "order-008",
+    "customerId": "cust-002",
+    "customerName": "Juan Pérez",
+    "customerEmail": "juan.perez@email.com",
+    "orderDate": "2025-11-21T16:31:39.194395Z",
+    "status": "PENDING",
+    "totalAmount": 799.98,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-701",
+        "name": "Tablet Samsung",
+        "quantity": 2,
+        "price": 399.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 295",
+      "city": "Málaga",
+      "state": "Andalucía",
+      "zipCode": "29001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-009",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2025-11-11T16:31:39.194426Z",
+    "status": "PENDING",
+    "totalAmount": 1349.97,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-902",
+        "name": "Escritorio Ajustable",
+        "quantity": 3,
+        "price": 449.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 795",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-010",
+    "customerId": "cust-002",
+    "customerName": "Juan Pérez",
+    "customerEmail": "juan.perez@email.com",
+    "orderDate": "2025-11-09T16:31:39.194453Z",
+    "status": "PENDING",
+    "totalAmount": 2799.96,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 1,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 3,
+        "price": 599.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Norte 691",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-011",
+    "customerId": "cust-004",
+    "customerName": "Carlos Rodríguez",
+    "customerEmail": "carlos.rodriguez@email.com",
+    "orderDate": "2025-11-21T16:31:39.194479Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 449.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-902",
+        "name": "Escritorio Ajustable",
+        "quantity": 1,
+        "price": 449.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Norte 216",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-21T17:31:39.194479Z",
+    "transactionId": "TXN-B33340EF"
+  },
+  {
+    "orderId": "order-012",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2025-11-02T16:31:39.194555Z",
+    "status": "SHIPPED",
+    "totalAmount": 779.96,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-1001",
+        "name": "Router WiFi 6",
+        "quantity": 1,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 2,
+        "price": 24.99
+      },
+      {
+        "productId": "prod-702",
+        "name": "iPad Air",
+        "quantity": 1,
+        "price": 599.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 277",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-02T17:31:39.194555Z",
+    "transactionId": "TXN-6BD6D4BB",
+    "shipmentDate": "2025-11-03T16:31:39.194555Z",
+    "trackingNumber": "TRACK-61CE4C8D81AB",
+    "estimatedDeliveryDays": 3
+  },
+  {
+    "orderId": "order-013",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2025-10-29T16:31:39.194641Z",
+    "status": "PENDING",
+    "totalAmount": 2439.93,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 1,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-301",
+        "name": "Monitor 24 pulgadas",
+        "quantity": 2,
+        "price": 199.99
+      },
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 1,
+        "price": 599.99
+      },
+      {
+        "productId": "prod-102",
+        "name": "Laptop Dell Inspiron",
+        "quantity": 3,
+        "price": 449.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 246",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-014",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2025-11-17T16:31:39.194669Z",
+    "status": "PENDING",
+    "totalAmount": 2289.94,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 1,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-702",
+        "name": "iPad Air",
+        "quantity": 2,
+        "price": 599.99
+      },
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 3,
+        "price": 29.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 559",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-015",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-25T16:31:39.194690Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 449.97,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-802",
+        "name": "Escáner Portátil",
+        "quantity": 3,
+        "price": 149.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Norte 601",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-25T17:31:39.194690Z",
+    "transactionId": "TXN-013F2AB6"
+  },
+  {
+    "orderId": "order-016",
+    "customerId": "cust-006",
+    "customerName": "Pedro López",
+    "customerEmail": "pedro.lopez@email.com",
+    "orderDate": "2025-11-17T16:31:39.194736Z",
+    "status": "DELIVERED",
+    "totalAmount": 2999.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 3,
+        "price": 999.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 94",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-17T17:31:39.194736Z",
+    "transactionId": "TXN-3D2950F8",
+    "shipmentDate": "2025-11-18T16:31:39.194736Z",
+    "trackingNumber": "TRACK-3C7CFFAA2C4E",
+    "estimatedDeliveryDays": 4,
+    "deliveryDate": "2025-11-23T16:31:39.194736Z"
+  },
+  {
+    "orderId": "order-017",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2025-11-23T16:31:39.194812Z",
+    "status": "PENDING",
+    "totalAmount": 59.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-503",
+        "name": "Memoria USB 64GB",
+        "quantity": 3,
+        "price": 19.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 99",
+      "city": "Zaragoza",
+      "state": "Aragón",
+      "zipCode": "50001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-018",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-06T16:31:39.194835Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 389.97,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-1001",
+        "name": "Router WiFi 6",
+        "quantity": 3,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 421",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-06T17:31:39.194835Z",
+    "transactionId": "TXN-7107666E"
+  },
+  {
+    "orderId": "order-019",
+    "customerId": "cust-004",
+    "customerName": "Carlos Rodríguez",
+    "customerEmail": "carlos.rodriguez@email.com",
+    "orderDate": "2025-10-30T16:31:39.194882Z",
+    "status": "PENDING",
+    "totalAmount": 2599.98,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 2,
+        "price": 1299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 780",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-020",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2025-11-07T16:31:39.194924Z",
+    "status": "PENDING",
+    "totalAmount": 1559.94,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 1,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-101",
+        "name": "Laptop HP 15",
+        "quantity": 2,
+        "price": 299.99
+      },
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 1,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-902",
+        "name": "Escritorio Ajustable",
+        "quantity": 2,
+        "price": 449.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 598",
+      "city": "Málaga",
+      "state": "Andalucía",
+      "zipCode": "29001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-021",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-10T16:31:39.194951Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 1331.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 1,
+        "price": 1299.99
+      },
+      {
+        "productId": "prod-601",
+        "name": "Cable USB-C",
+        "quantity": 2,
+        "price": 15.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 332",
+      "city": "Bilbao",
+      "state": "País Vasco",
+      "zipCode": "48001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-10T17:31:39.194951Z",
+    "transactionId": "TXN-2A32C647"
+  },
+  {
+    "orderId": "order-022",
+    "customerId": "cust-004",
+    "customerName": "Carlos Rodríguez",
+    "customerEmail": "carlos.rodriguez@email.com",
+    "orderDate": "2025-11-11T16:31:39.195206Z",
+    "status": "PENDING",
+    "totalAmount": 799.98,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-701",
+        "name": "Tablet Samsung",
+        "quantity": 2,
+        "price": 399.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 116",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-023",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2025-11-15T16:31:39.195297Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 4879.94,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 3,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-501",
+        "name": "Disco Duro Externo 1TB",
+        "quantity": 1,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-902",
+        "name": "Escritorio Ajustable",
+        "quantity": 1,
+        "price": 449.99
+      },
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 1,
+        "price": 1299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 786",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-15T17:31:39.195297Z",
+    "transactionId": "TXN-ABF2A386"
+  },
+  {
+    "orderId": "order-024",
+    "customerId": "cust-009",
+    "customerName": "Carmen Ruiz",
+    "customerEmail": "carmen.ruiz@email.com",
+    "orderDate": "2025-11-22T16:31:39.195406Z",
+    "status": "PENDING",
+    "totalAmount": 1199.98,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 2,
+        "price": 599.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 933",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-025",
+    "customerId": "cust-010",
+    "customerName": "David Moreno",
+    "customerEmail": "david.moreno@email.com",
+    "orderDate": "2025-11-24T16:31:39.195430Z",
+    "status": "DELIVERED",
+    "totalAmount": 2999.92,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 3,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-501",
+        "name": "Disco Duro Externo 1TB",
+        "quantity": 1,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 2,
+        "price": 1299.99
+      },
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 2,
+        "price": 89.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 179",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-24T17:31:39.195430Z",
+    "transactionId": "TXN-E89D604A",
+    "shipmentDate": "2025-11-25T16:31:39.195430Z",
+    "trackingNumber": "TRACK-82AC02CA0AE2",
+    "estimatedDeliveryDays": 3,
+    "deliveryDate": "2025-11-27T16:31:39.195430Z"
+  },
+  {
+    "orderId": "order-026",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2025-11-09T16:31:39.195469Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 1757.96,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-701",
+        "name": "Tablet Samsung",
+        "quantity": 2,
+        "price": 399.99
+      },
+      {
+        "productId": "prod-302",
+        "name": "Monitor 27 pulgadas",
+        "quantity": 2,
+        "price": 349.0
+      },
+      {
+        "productId": "prod-1001",
+        "name": "Router WiFi 6",
+        "quantity": 2,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 474",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-09T17:31:39.195469Z",
+    "transactionId": "TXN-C550D875"
+  },
+  {
+    "orderId": "order-027",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2025-11-17T16:31:39.195491Z",
+    "status": "SHIPPED",
+    "totalAmount": 1176.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-402",
+        "name": "Auriculares Gaming",
+        "quantity": 1,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-302",
+        "name": "Monitor 27 pulgadas",
+        "quantity": 3,
+        "price": 349.0
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 449",
+      "city": "Murcia",
+      "state": "Murcia",
+      "zipCode": "30001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-17T17:31:39.195491Z",
+    "transactionId": "TXN-ABD63BB0",
+    "shipmentDate": "2025-11-18T16:31:39.195491Z",
+    "trackingNumber": "TRACK-5D5F6F8D0053",
+    "estimatedDeliveryDays": 5
+  },
+  {
+    "orderId": "order-028",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2025-11-19T16:31:39.195520Z",
+    "status": "PENDING",
+    "totalAmount": 3959.91,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-501",
+        "name": "Disco Duro Externo 1TB",
+        "quantity": 2,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-301",
+        "name": "Monitor 24 pulgadas",
+        "quantity": 2,
+        "price": 199.99
+      },
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 3,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-802",
+        "name": "Escáner Portátil",
+        "quantity": 2,
+        "price": 149.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 150",
+      "city": "Bilbao",
+      "state": "País Vasco",
+      "zipCode": "48001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-029",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-17T16:31:39.195540Z",
+    "status": "PENDING",
+    "totalAmount": 869.96,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 3,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 1,
+        "price": 599.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 886",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-030",
+    "customerId": "cust-007",
+    "customerName": "Isabel Fernández",
+    "customerEmail": "isabel.fernandez@email.com",
+    "orderDate": "2025-11-17T16:31:39.195554Z",
+    "status": "DELIVERED",
+    "totalAmount": 299.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-101",
+        "name": "Laptop HP 15",
+        "quantity": 1,
+        "price": 299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 207",
+      "city": "Bilbao",
+      "state": "País Vasco",
+      "zipCode": "48001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-17T17:31:39.195554Z",
+    "transactionId": "TXN-7D22E869",
+    "shipmentDate": "2025-11-18T16:31:39.195554Z",
+    "trackingNumber": "TRACK-B1886C1BCB10",
+    "estimatedDeliveryDays": 3,
+    "deliveryDate": "2025-11-22T16:31:39.195554Z"
+  },
+  {
+    "orderId": "order-031",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-19T16:31:39.195587Z",
+    "status": "PENDING",
+    "totalAmount": 79.99,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 1,
+        "price": 79.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 201",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-032",
+    "customerId": "cust-006",
+    "customerName": "Pedro López",
+    "customerEmail": "pedro.lopez@email.com",
+    "orderDate": "2025-11-24T16:31:39.195600Z",
+    "status": "DELIVERED",
+    "totalAmount": 299.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-101",
+        "name": "Laptop HP 15",
+        "quantity": 1,
+        "price": 299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 971",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-24T17:31:39.195600Z",
+    "transactionId": "TXN-039BECEF",
+    "shipmentDate": "2025-11-25T16:31:39.195600Z",
+    "trackingNumber": "TRACK-B3097C033BAD",
+    "estimatedDeliveryDays": 5,
+    "deliveryDate": "2025-11-29T16:31:39.195600Z"
+  },
+  {
+    "orderId": "order-033",
+    "customerId": "cust-010",
+    "customerName": "David Moreno",
+    "customerEmail": "david.moreno@email.com",
+    "orderDate": "2025-11-04T16:31:39.195634Z",
+    "status": "PENDING",
+    "totalAmount": 899.96,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-1002",
+        "name": "Cámara Web 4K",
+        "quantity": 2,
+        "price": 199.99
+      },
+      {
+        "productId": "prod-901",
+        "name": "Silla Gaming",
+        "quantity": 1,
+        "price": 299.99
+      },
+      {
+        "productId": "prod-1002",
+        "name": "Cámara Web 4K",
+        "quantity": 1,
+        "price": 199.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 115",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-034",
+    "customerId": "cust-010",
+    "customerName": "David Moreno",
+    "customerEmail": "david.moreno@email.com",
+    "orderDate": "2025-11-14T16:31:39.195650Z",
+    "status": "DELIVERED",
+    "totalAmount": 189.97,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-503",
+        "name": "Memoria USB 64GB",
+        "quantity": 1,
+        "price": 19.99
+      },
+      {
+        "productId": "prod-203",
+        "name": "Webcam HD",
+        "quantity": 1,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 1,
+        "price": 79.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 708",
+      "city": "Bilbao",
+      "state": "País Vasco",
+      "zipCode": "48001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-14T17:31:39.195650Z",
+    "transactionId": "TXN-D0BDB7E9",
+    "shipmentDate": "2025-11-15T16:31:39.195650Z",
+    "trackingNumber": "TRACK-3F8C0D6499BA",
+    "estimatedDeliveryDays": 3,
+    "deliveryDate": "2025-11-18T16:31:39.195650Z"
+  },
+  {
+    "orderId": "order-035",
+    "customerId": "cust-004",
+    "customerName": "Carlos Rodríguez",
+    "customerEmail": "carlos.rodriguez@email.com",
+    "orderDate": "2025-11-01T16:31:39.195696Z",
+    "status": "PENDING",
+    "totalAmount": 1259.95,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-503",
+        "name": "Memoria USB 64GB",
+        "quantity": 3,
+        "price": 19.99
+      },
+      {
+        "productId": "prod-301",
+        "name": "Monitor 24 pulgadas",
+        "quantity": 1,
+        "price": 199.99
+      },
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 1,
+        "price": 999.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 513",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-036",
+    "customerId": "cust-010",
+    "customerName": "David Moreno",
+    "customerEmail": "david.moreno@email.com",
+    "orderDate": "2025-11-13T16:31:39.195712Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 79.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-602",
+        "name": "Hub USB 4 puertos",
+        "quantity": 1,
+        "price": 29.99
+      },
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 2,
+        "price": 24.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 806",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-13T17:31:39.195712Z",
+    "transactionId": "TXN-76F31217"
+  },
+  {
+    "orderId": "order-037",
+    "customerId": "cust-010",
+    "customerName": "David Moreno",
+    "customerEmail": "david.moreno@email.com",
+    "orderDate": "2025-11-19T16:31:39.195750Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 259.97,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 2,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 1,
+        "price": 79.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 795",
+      "city": "Zaragoza",
+      "state": "Aragón",
+      "zipCode": "50001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-19T17:31:39.195750Z",
+    "transactionId": "TXN-C625D03C"
+  },
+  {
+    "orderId": "order-038",
+    "customerId": "cust-002",
+    "customerName": "Juan Pérez",
+    "customerEmail": "juan.perez@email.com",
+    "orderDate": "2025-11-25T16:31:39.195782Z",
+    "status": "PENDING",
+    "totalAmount": 209.98,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 1,
+        "price": 79.99
+      },
+      {
+        "productId": "prod-402",
+        "name": "Auriculares Gaming",
+        "quantity": 1,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 546",
+      "city": "Barcelona",
+      "state": "Cataluña",
+      "zipCode": "08001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-039",
+    "customerId": "cust-007",
+    "customerName": "Isabel Fernández",
+    "customerEmail": "isabel.fernandez@email.com",
+    "orderDate": "2025-11-12T16:31:39.195802Z",
+    "status": "DELIVERED",
+    "totalAmount": 7179.9,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 2,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 3,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-303",
+        "name": "Monitor 32 pulgadas 4K",
+        "quantity": 3,
+        "price": 599.99
+      },
+      {
+        "productId": "prod-801",
+        "name": "Impresora WiFi",
+        "quantity": 2,
+        "price": 189.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 759",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-12T17:31:39.195802Z",
+    "transactionId": "TXN-DC6B07BA",
+    "shipmentDate": "2025-11-13T16:31:39.195802Z",
+    "trackingNumber": "TRACK-7979BDE5D0FC",
+    "estimatedDeliveryDays": 3,
+    "deliveryDate": "2025-11-15T16:31:39.195802Z"
+  },
+  {
+    "orderId": "order-040",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2025-11-19T16:31:39.195834Z",
+    "status": "PENDING",
+    "totalAmount": 129.99,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-501",
+        "name": "Disco Duro Externo 1TB",
+        "quantity": 1,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 801",
+      "city": "Madrid",
+      "state": "Madrid",
+      "zipCode": "28001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-041",
+    "customerId": "cust-007",
+    "customerName": "Isabel Fernández",
+    "customerEmail": "isabel.fernandez@email.com",
+    "orderDate": "2025-10-28T16:31:39.195854Z",
+    "status": "PAYMENT_PROCESSED",
+    "totalAmount": 439.96,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 2,
+        "price": 89.99
+      },
+      {
+        "productId": "prod-402",
+        "name": "Auriculares Gaming",
+        "quantity": 2,
+        "price": 129.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 598",
+      "city": "Málaga",
+      "state": "Andalucía",
+      "zipCode": "29001",
+      "country": "España"
+    },
+    "paymentDate": "2025-10-28T17:31:39.195854Z",
+    "transactionId": "TXN-44A73F97"
+  },
+  {
+    "orderId": "order-042",
+    "customerId": "cust-006",
+    "customerName": "Pedro López",
+    "customerEmail": "pedro.lopez@email.com",
+    "orderDate": "2025-11-11T16:31:39.195909Z",
+    "status": "SHIPPED",
+    "totalAmount": 4539.92,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-801",
+        "name": "Impresora WiFi",
+        "quantity": 2,
+        "price": 189.99
+      },
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 1,
+        "price": 79.99
+      },
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 3,
+        "price": 1299.99
+      },
+      {
+        "productId": "prod-502",
+        "name": "SSD Externo 500GB",
+        "quantity": 2,
+        "price": 89.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 590",
+      "city": "Málaga",
+      "state": "Andalucía",
+      "zipCode": "29001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-11T17:31:39.195909Z",
+    "transactionId": "TXN-282A9265",
+    "shipmentDate": "2025-11-12T16:31:39.195909Z",
+    "trackingNumber": "TRACK-5858413D4367",
+    "estimatedDeliveryDays": 5
+  },
+  {
+    "orderId": "order-043",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2025-11-21T16:31:39.195973Z",
+    "status": "SHIPPED",
+    "totalAmount": 772.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 3,
+        "price": 24.99
+      },
+      {
+        "productId": "prod-302",
+        "name": "Monitor 27 pulgadas",
+        "quantity": 2,
+        "price": 349.0
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 95",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-21T17:31:39.195973Z",
+    "transactionId": "TXN-07B2C9F1",
+    "shipmentDate": "2025-11-22T16:31:39.195973Z",
+    "trackingNumber": "TRACK-1196110AD25A",
+    "estimatedDeliveryDays": 3
+  },
+  {
+    "orderId": "order-044",
+    "customerId": "cust-005",
+    "customerName": "Laura Sánchez",
+    "customerEmail": "laura.sanchez@email.com",
+    "orderDate": "2025-11-01T16:31:39.196039Z",
+    "status": "DELIVERED",
+    "totalAmount": 3899.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 3,
+        "price": 1299.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Principal 553",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-01T17:31:39.196039Z",
+    "transactionId": "TXN-ECF6A92F",
+    "shipmentDate": "2025-11-02T16:31:39.196039Z",
+    "trackingNumber": "TRACK-C00E904CE728",
+    "estimatedDeliveryDays": 3,
+    "deliveryDate": "2025-11-04T16:31:39.196039Z"
+  },
+  {
+    "orderId": "order-045",
+    "customerId": "cust-007",
+    "customerName": "Isabel Fernández",
+    "customerEmail": "isabel.fernandez@email.com",
+    "orderDate": "2025-11-13T16:31:39.196167Z",
+    "status": "SHIPPED",
+    "totalAmount": 3074.96,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-102",
+        "name": "Laptop Dell Inspiron",
+        "quantity": 1,
+        "price": 449.99
+      },
+      {
+        "productId": "prod-104",
+        "name": "MacBook Pro 14",
+        "quantity": 2,
+        "price": 1299.99
+      },
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 1,
+        "price": 24.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Norte 490",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-13T17:31:39.196167Z",
+    "transactionId": "TXN-C86531CD",
+    "shipmentDate": "2025-11-14T16:31:39.196167Z",
+    "trackingNumber": "TRACK-25CFAA49A5A4",
+    "estimatedDeliveryDays": 5
+  },
+  {
+    "orderId": "order-046",
+    "customerId": "cust-003",
+    "customerName": "Ana Martínez",
+    "customerEmail": "ana.martinez@email.com",
+    "orderDate": "2025-11-18T16:31:39.196325Z",
+    "status": "SHIPPED",
+    "totalAmount": 1189.96,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-301",
+        "name": "Monitor 24 pulgadas",
+        "quantity": 1,
+        "price": 199.99
+      },
+      {
+        "productId": "prod-902",
+        "name": "Escritorio Ajustable",
+        "quantity": 2,
+        "price": 449.99
+      },
+      {
+        "productId": "prod-203",
+        "name": "Webcam HD",
+        "quantity": 1,
+        "price": 89.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 877",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-18T17:31:39.196325Z",
+    "transactionId": "TXN-EAFE8DC5",
+    "shipmentDate": "2025-11-19T16:31:39.196325Z",
+    "trackingNumber": "TRACK-AAF5F3E64015",
+    "estimatedDeliveryDays": 4
+  },
+  {
+    "orderId": "order-047",
+    "customerId": "cust-008",
+    "customerName": "Miguel Torres",
+    "customerEmail": "miguel.torres@email.com",
+    "orderDate": "2025-11-10T16:31:39.196393Z",
+    "status": "PENDING",
+    "totalAmount": 2219.92,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-402",
+        "name": "Auriculares Gaming",
+        "quantity": 3,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-501",
+        "name": "Disco Duro Externo 1TB",
+        "quantity": 1,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-701",
+        "name": "Tablet Samsung",
+        "quantity": 2,
+        "price": 399.99
+      },
+      {
+        "productId": "prod-102",
+        "name": "Laptop Dell Inspiron",
+        "quantity": 2,
+        "price": 449.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Luna 515",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    }
+  },
+  {
+    "orderId": "order-048",
+    "customerId": "cust-010",
+    "customerName": "David Moreno",
+    "customerEmail": "david.moreno@email.com",
+    "orderDate": "2025-11-10T16:31:39.196423Z",
+    "status": "SHIPPED",
+    "totalAmount": 74.97,
+    "paymentMethod": "debit_card",
+    "items": [
+      {
+        "productId": "prod-201",
+        "name": "Mouse Inalámbrico",
+        "quantity": 3,
+        "price": 24.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 408",
+      "city": "Bilbao",
+      "state": "País Vasco",
+      "zipCode": "48001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-10T17:31:39.196423Z",
+    "transactionId": "TXN-DE0546A3",
+    "shipmentDate": "2025-11-11T16:31:39.196423Z",
+    "trackingNumber": "TRACK-79D0A66A7698",
+    "estimatedDeliveryDays": 4
+  },
+  {
+    "orderId": "order-049",
+    "customerId": "cust-001",
+    "customerName": "María García",
+    "customerEmail": "maria.garcia@email.com",
+    "orderDate": "2025-11-14T16:31:39.196507Z",
+    "status": "SHIPPED",
+    "totalAmount": 179.98,
+    "paymentMethod": "paypal",
+    "items": [
+      {
+        "productId": "prod-203",
+        "name": "Webcam HD",
+        "quantity": 2,
+        "price": 89.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Sol 999",
+      "city": "Sevilla",
+      "state": "Andalucía",
+      "zipCode": "41001",
+      "country": "España"
+    },
+    "paymentDate": "2025-11-14T17:31:39.196507Z",
+    "transactionId": "TXN-18BDF051",
+    "shipmentDate": "2025-11-15T16:31:39.196507Z",
+    "trackingNumber": "TRACK-A903EC33DCD7",
+    "estimatedDeliveryDays": 3
+  },
+  {
+    "orderId": "order-050",
+    "customerId": "cust-006",
+    "customerName": "Pedro López",
+    "customerEmail": "pedro.lopez@email.com",
+    "orderDate": "2025-11-16T16:31:39.196562Z",
+    "status": "PENDING",
+    "totalAmount": 2229.92,
+    "paymentMethod": "credit_card",
+    "items": [
+      {
+        "productId": "prod-1001",
+        "name": "Router WiFi 6",
+        "quantity": 3,
+        "price": 129.99
+      },
+      {
+        "productId": "prod-702",
+        "name": "iPad Air",
+        "quantity": 1,
+        "price": 599.99
+      },
+      {
+        "productId": "prod-103",
+        "name": "MacBook Air M2",
+        "quantity": 1,
+        "price": 999.99
+      },
+      {
+        "productId": "prod-202",
+        "name": "Teclado Mecánico",
+        "quantity": 3,
+        "price": 79.99
+      }
+    ],
+    "shippingAddress": {
+      "street": "Calle Mayor 684",
+      "city": "Valencia",
+      "state": "Valencia",
+      "zipCode": "46001",
+      "country": "España"
+    }
+  }
+]
