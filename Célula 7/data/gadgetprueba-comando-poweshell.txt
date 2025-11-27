@@ -1,0 +1,46 @@
+$gadgets = @(
+    @{
+        "gadgetId"="g1"; "nombre"="Smart Watch"; "categorias"=@("Relojes","Wearables","Tecnologia"); "descripcion"="Un reloj inteligente con monitoreo de actividad física y notificaciones."
+    },
+    @{
+        "gadgetId"="g2"; "nombre"="Auriculares Bluetooth"; "categorias"=@("Audio","Accesorios","Tecnologia"); "descripcion"="Auriculares inalámbricos con cancelación de ruido y micrófono incorporado."
+    },
+    @{
+        "gadgetId"="g3"; "nombre"="Camara de Seguridad"; "categorias"=@("Hogar","Seguridad","Tecnologia"); "descripcion"="Cámara IP con visión nocturna y notificaciones en tiempo real al móvil."
+    },
+    @{
+        "gadgetId"="g4"; "nombre"="Drone Fotografico"; "categorias"=@("Aereo","Fotografia","Tecnologia"); "descripcion"="Drone con cámara 4K y control por app móvil, ideal para tomas aéreas."
+    },
+    @{
+        "gadgetId"="g5"; "nombre"="Tablet 10 pulgadas"; "categorias"=@("Computacion","Tablet","Tecnologia"); "descripcion"="Tablet con pantalla táctil, batería de larga duración y cámara frontal."
+    },
+    @{
+        "gadgetId"="g6"; "nombre"="Altavoz Inteligente"; "categorias"=@("Hogar","Audio","Smart Home"); "descripcion"="Altavoz con asistente virtual integrado y compatibilidad con domótica."
+    },
+    @{
+        "gadgetId"="g7"; "nombre"="Bateria Externa"; "categorias"=@("Accesorios","Movilidad","Tecnologia"); "descripcion"="Power bank de alta capacidad, compatible con smartphones y tablets."
+    },
+    @{
+        "gadgetId"="g8"; "nombre"="Reloj Deportivo"; "categorias"=@("Relojes","Deporte","Wearables"); "descripcion"="Reloj con GPS, monitor de ritmo cardíaco y seguimiento de actividad física."
+    },
+    @{
+        "gadgetId"="g9"; "nombre"="Lampara Inteligente"; "categorias"=@("Hogar","Iluminacion","Smart Home"); "descripcion"="Lámpara LED controlable vía app y compatible con asistentes de voz."
+    },
+    @{
+        "gadgetId"="g10"; "nombre"="Camara de Accion"; "categorias"=@("Fotografia","Deporte","Tecnologia"); "descripcion"="Cámara resistente al agua con grabación 4K y múltiples accesorios."
+    }
+)
+
+# URL de tu API Gateway que invoca la Lambda
+$apiUrl = "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/pro2/gadgetprueba"
+
+foreach ($g in $gadgets) {
+    $body = $g | ConvertTo-Json -Depth 5
+    try {
+        $response = Invoke-RestMethod -Uri $apiUrl -Method Post -Body $body -ContentType "application/json"
+        Write-Host "Gadget $($g.gadgetId) insertado correctamente"
+        Write-Host "Respuesta: $($response | ConvertTo-Json -Depth 5)"
+    } catch {
+        Write-Host "Error al insertar $($g.gadgetId): $_"
+    }
+}

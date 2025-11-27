@@ -1,0 +1,268 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Sistema de votación - Célula 7 (Votes + Lambdas + API + Cognito)
+
+Parameters:
+  LambdaBucket:
+    Type: String
+    Description: Nombre del bucket S3 donde están los ZIP de las Lambdas.
+
+  EmitVoteKey:
+    Type: String
+    Description: Key del ZIP de emitVote en el bucket S3.
+
+  GetResultsKey:
+    Type: String
+    Description: Key del ZIP de getResults en el bucket S3.
+
+  StreamProcessorKey:
+    Type: String
+    Description: Key del ZIP de streamProcessor en el bucket S3.
+
+Resources:
+
+  #######################################################
+  # DynamoDB: Votes
+  #######################################################
+  VotesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Votes
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: voteId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: voteId
+          KeyType: RANGE
+      StreamSpecification:
+        StreamEnabled: true
+        StreamViewType: NEW_IMAGE
+
+  #######################################################
+  # DynamoDB: VoteResults
+  #######################################################
+  VoteResultsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: VoteResults
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gadgetId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gadgetId
+          KeyType: HASH
+
+  #######################################################
+  # Cognito User Pool
+  #######################################################
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: VotingUserPool
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireUppercase: false
+          RequireNumbers: true
+          RequireSymbols: false
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: VotingClient
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  #######################################################
+  # IAM Roles for Lambdas
+  #######################################################
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: VotingLambdaRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoPolicies
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                  - dynamodb:DescribeTable
+                Resource:
+                  - !GetAtt VotesTable.Arn
+                  - !GetAtt VoteResultsTable.Arn
+
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeStream
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                  - dynamodb:ListStreams
+                Resource: "*"
+
+  #######################################################
+  # Lambda: emitVote
+  #######################################################
+  EmitVoteLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: emitVote
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.11
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      Environment:
+        Variables:
+          VOTES_TABLE: !Ref VotesTable
+      Code:
+        S3Bucket: !Ref LambdaBucket
+        S3Key: !Ref EmitVoteKey
+
+  #######################################################
+  # Lambda: getResults
+  #######################################################
+  GetResultsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: getResults
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.11
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      Environment:
+        Variables:
+          RESULTS_TABLE: !Ref VoteResultsTable
+      Code:
+        S3Bucket: !Ref LambdaBucket
+        S3Key: !Ref GetResultsKey
+
+  #######################################################
+  # Lambda: streamProcessor
+  #######################################################
+  StreamProcessorLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: streamProcessor
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.11
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      Environment:
+        Variables:
+          RESULTS_TABLE: !Ref VoteResultsTable
+      Code:
+        S3Bucket: !Ref LambdaBucket
+        S3Key: !Ref StreamProcessorKey
+
+  #######################################################
+  # Stream → Lambda Event Source Mapping
+  #######################################################
+  StreamEventMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 100
+      Enabled: true
+      EventSourceArn: !GetAtt VotesTable.StreamArn
+      FunctionName: !Ref StreamProcessorLambda
+      StartingPosition: LATEST
+
+  #######################################################
+  # API Gateway (HTTP API)
+  #######################################################
+  VotingApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: VotingAPI
+      ProtocolType: HTTP
+
+  #######################################################
+  # API Integrations
+  #######################################################
+  VoteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref VotingApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EmitVoteLambda.Arn}/invocations
+
+  ResultsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref VotingApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetResultsLambda.Arn}/invocations
+
+  #######################################################
+  # API Routes
+  #######################################################
+  VoteRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref VotingApi
+      RouteKey: "POST /vote"
+      Target: !Join [ "/", [ "integrations", !Ref VoteIntegration ] ]
+
+  ResultsRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref VotingApi
+      RouteKey: "GET /results"
+      Target: !Join [ "/", [ "integrations", !Ref ResultsIntegration ] ]
+
+  #######################################################
+  # API Permissions
+  #######################################################
+  AllowEmitVoteInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EmitVoteLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+
+  AllowGetResultsInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GetResultsLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+
+Outputs:
+  ApiEndpoint:
+    Description: URL base de la API
+    Value: !Sub https://${VotingApi}.execute-api.${AWS::Region}.amazonaws.com
+
+  VotesTableOut:
+    Value: !Ref VotesTable
+
+  ResultsTableOut:
+    Value: !Ref VoteResultsTable
+
+  UserPoolOut:
+    Value: !Ref UserPool
+
+  UserPoolClientOut:
+    Value: !Ref UserPoolClient

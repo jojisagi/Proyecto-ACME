@@ -1,0 +1,4 @@
+Invoke-RestMethod -Uri "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/pro2/results" -Method GET
+
+
+
