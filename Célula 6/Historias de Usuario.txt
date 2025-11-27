@@ -1,0 +1,11 @@
+HU-6.1 – Enviar lote de toons
+
+Como sistema externo
+Quiero enviar un lote masivo de toons
+Para procesarlos en paralelo.
+
+HU-6.2 – Consultar estatus del job
+
+Como cliente del servicio
+Quiero conocer el progreso del procesamiento
+Para integrarlo con mis pipelines de análisis.

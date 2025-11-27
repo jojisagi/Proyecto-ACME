@@ -1,0 +1,11 @@
+HU-2.1 – Programar una orden automática
+
+Como gerente de operaciones
+Quiero crear un schedule
+Para generar órdenes sin intervención manual.
+
+HU-2.2 – Ejecutar una orden programada
+
+Como usuario autenticado
+Quiero que la orden se genere automáticamente
+Para garantizar reposición puntual.

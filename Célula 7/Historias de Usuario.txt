@@ -1,0 +1,11 @@
+HU-7.1 – Emitir un voto
+
+Como usuario autenticado
+Quiero votar por un gadget
+Para participar en el evento anual.
+
+HU-7.2 – Consultar resultados en tiempo real
+
+Como usuario
+Quiero ver los resultados
+Para conocer al gadget ganador.
