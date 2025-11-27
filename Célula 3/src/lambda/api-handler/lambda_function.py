@@ -1,116 +1,219 @@
+"""
+Lambda Function: API Handler
+Maneja las peticiones del API Gateway para gestión de imágenes
+"""
 import json
+import os
 import boto3
-import logging
 from datetime import datetime, timedelta
+from decimal import Decimal
+import logging
 
+# Configuración
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 
-import os
-PROCESSED_BUCKET = os.environ.get('PROCESSED_BUCKET', 'acme-gadgets-processed')
-RAW_BUCKET = os.environ.get('RAW_BUCKET', 'acme-gadgets-raw')
-DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'GadgetImages')
+RAW_BUCKET = os.environ['RAW_BUCKET']
+PROCESSED_BUCKET = os.environ['PROCESSED_BUCKET']
+DYNAMODB_TABLE = os.environ['DYNAMODB_TABLE']
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'sandbox')
+
+table = dynamodb.Table(DYNAMODB_TABLE)
+
+# URL firmada válida por 15 minutos
+PRESIGNED_URL_EXPIRATION = 900
+
 
 def lambda_handler(event, context):
     """
-    Maneja requests del API:
-    - GET /images -> lista imágenes
-    - POST /upload-url -> genera URL de carga
-    - GET /image/{gadgetId}/{imageId} -> obtiene metadatos
+    Handler principal - enruta las peticiones según el path y método
     """
+    logger.info(f"Event received: {json.dumps(event)}")
+    
     try:
         http_method = event.get('httpMethod')
         path = event.get('path', '')
+        path_parameters = event.get('pathParameters') or {}
         
-        logger.info(f"Método: {http_method}, Path: {path}")
+        # Obtener información del usuario desde Cognito
+        claims = event.get('requestContext', {}).get('authorizer', {}).get('claims', {})
+        user_email = claims.get('email', 'unknown')
         
-        if http_method == 'GET' and path == '/images':
-            return list_images()
+        logger.info(f"Request: {http_method} {path} by {user_email}")
         
-        elif http_method == 'POST' and path == '/upload-url':
-            body = json.loads(event.get('body', '{}'))
-            gadget_id = body.get('gadgetId')
-            return get_upload_url(gadget_id)
+        # Enrutamiento
+        if path == '/upload-url' and http_method == 'POST':
+            return handle_upload_url(event, user_email)
         
-        elif http_method == 'GET' and '/image/' in path:
-            parts = path.split('/')
-            gadget_id = parts[-2]
-            image_id = parts[-1]
-            return get_image_metadata(gadget_id, image_id)
+        elif path == '/images' and http_method == 'GET':
+            return handle_list_images(event, user_email)
+        
+        elif path.startswith('/images/') and http_method == 'GET':
+            image_id = path_parameters.get('imageId')
+            return handle_get_image(image_id, user_email)
         
         else:
-            return error_response(404, 'Endpoint no encontrado')
-            
+            return response(404, {'error': 'Not found'})
+    
     except Exception as e:
-        logger.error(f"Error: {str(e)}")
-        return error_response(500, str(e))
+        logger.error(f"Error handling request: {str(e)}", exc_info=True)
+        return response(500, {'error': 'Internal server error', 'message': str(e)})
 
-def list_images():
-    """Lista todas las imágenes"""
+
+def handle_upload_url(event, user_email):
+    """
+    POST /upload-url
+    Genera una URL firmada para subir una imagen
+    """
     try:
-        table = dynamodb.Table(DYNAMODB_TABLE)
-        response = table.scan()
+        body = json.loads(event.get('body', '{}'))
+        gadget_id = body.get('gadgetId')
+        filename = body.get('filename', 'image.jpg')
         
-        return success_response({
-            'images': response.get('Items', []),
-            'count': response.get('Count', 0)
-        })
-    except Exception as e:
-        return error_response(500, str(e))
-
-def get_upload_url(gadget_id):
-    """Genera URL firmada para subir imagen"""
-    try:
         if not gadget_id:
-            return error_response(400, 'gadgetId es requerido')
+            return response(400, {'error': 'gadgetId is required'})
         
-        # Generar nombre único
+        # Generar key para S3
         timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
-        key = f"{gadget_id}/{timestamp}_upload.jpg"
+        key = f"{gadget_id}/{timestamp}-{filename}"
         
-        # Generar URL firmada (válida 1 hora)
-        url = s3_client.generate_presigned_url(
+        # Generar URL firmada para PUT
+        presigned_url = s3_client.generate_presigned_url(
             'put_object',
-            Params={'Bucket': RAW_BUCKET, 'Key': key},
-            ExpiresIn=3600
+            Params={
+                'Bucket': RAW_BUCKET,
+                'Key': key,
+                'ContentType': 'image/jpeg'
+            },
+            ExpiresIn=PRESIGNED_URL_EXPIRATION
         )
         
-        return success_response({
-            'uploadUrl': url,
+        logger.info(f"Generated upload URL for {gadget_id}: {key}")
+        
+        return response(200, {
+            'uploadUrl': presigned_url,
+            'key': key,
             'gadgetId': gadget_id,
-            'expiresIn': 3600
+            'expiresIn': PRESIGNED_URL_EXPIRATION
         })
+    
     except Exception as e:
-        return error_response(500, str(e))
+        logger.error(f"Error generating upload URL: {str(e)}")
+        return response(500, {'error': 'Failed to generate upload URL'})
 
-def get_image_metadata(gadget_id, image_id):
-    """Obtiene metadatos de una imagen"""
+
+def handle_list_images(event, user_email):
+    """
+    GET /images
+    Lista todas las imágenes con paginación
+    """
     try:
-        table = dynamodb.Table(DYNAMODB_TABLE)
-        response = table.get_item(
-            Key={'gadgetId': gadget_id, 'imageId': image_id}
+        query_params = event.get('queryStringParameters') or {}
+        gadget_id = query_params.get('gadgetId')
+        limit = int(query_params.get('limit', 50))
+        
+        if gadget_id:
+            # Query por gadgetId específico
+            response_data = table.query(
+                KeyConditionExpression='gadgetId = :gid',
+                ExpressionAttributeValues={':gid': gadget_id},
+                Limit=limit
+            )
+        else:
+            # Scan de toda la tabla
+            response_data = table.scan(Limit=limit)
+        
+        items = response_data.get('Items', [])
+        
+        # Convertir Decimal a float para JSON
+        items = json.loads(json.dumps(items, default=decimal_default))
+        
+        logger.info(f"Listed {len(items)} images")
+        
+        return response(200, {
+            'images': items,
+            'count': len(items),
+            'scannedCount': response_data.get('ScannedCount', 0)
+        })
+    
+    except Exception as e:
+        logger.error(f"Error listing images: {str(e)}")
+        return response(500, {'error': 'Failed to list images'})
+
+
+def handle_get_image(image_id, user_email):
+    """
+    GET /images/{imageId}
+    Obtiene metadatos y URLs firmadas de una imagen específica
+    """
+    try:
+        if not image_id:
+            return response(400, {'error': 'imageId is required'})
+        
+        # Buscar en DynamoDB - necesitamos hacer un scan porque solo tenemos imageId
+        response_data = table.scan(
+            FilterExpression='imageId = :iid',
+            ExpressionAttributeValues={':iid': image_id}
         )
         
-        if 'Item' not in response:
-            return error_response(404, 'Imagen no encontrada')
+        items = response_data.get('Items', [])
         
-        return success_response(response['Item'])
+        if not items:
+            return response(404, {'error': 'Image not found'})
+        
+        item = items[0]
+        
+        # Generar URLs firmadas para cada versión
+        versions = item.get('versions', {})
+        signed_urls = {}
+        
+        for version_name, key in versions.items():
+            signed_urls[version_name] = s3_client.generate_presigned_url(
+                'get_object',
+                Params={
+                    'Bucket': PROCESSED_BUCKET,
+                    'Key': key
+                },
+                ExpiresIn=PRESIGNED_URL_EXPIRATION
+            )
+        
+        # Convertir Decimal a float
+        item = json.loads(json.dumps(item, default=decimal_default))
+        item['signedUrls'] = signed_urls
+        item['urlExpiresIn'] = PRESIGNED_URL_EXPIRATION
+        
+        logger.info(f"Retrieved image: {image_id}")
+        
+        return response(200, item)
+    
     except Exception as e:
-        return error_response(500, str(e))
+        logger.error(f"Error getting image: {str(e)}")
+        return response(500, {'error': 'Failed to get image'})
 
-def success_response(data):
-    return {
-        'statusCode': 200,
-        'body': json.dumps(data),
-        'headers': {'Content-Type': 'application/json'}
-    }
 
-def error_response(status_code, message):
+def response(status_code, body):
+    """
+    Genera una respuesta HTTP estándar
+    """
     return {
         'statusCode': status_code,
-        'body': json.dumps({'error': message}),
-        'headers': {'Content-Type': 'application/json'}
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+        },
+        'body': json.dumps(body)
     }
+
+
+def decimal_default(obj):
+    """
+    Helper para convertir Decimal a float en JSON
+    """
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError
