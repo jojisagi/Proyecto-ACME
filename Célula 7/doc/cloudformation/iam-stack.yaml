@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM Roles y Políticas para Sistema de Votación Gadget del Año'
+
+Resources:
+  # Role para Lambda EmitVote (Escritura)
+  EmitVoteLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GadgetVoting-EmitVote-Role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: EmitVotePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Votes'
+
+  # Role para Lambda GetResults (Lectura)
+  GetResultsLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GadgetVoting-GetResults-Role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: GetResultsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                  - dynamodb:Query
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/VoteResults'
+
+  # Role para Lambda StreamProcessor (Lectura de Stream y Escritura de Resultados)
+  StreamProcessorLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GadgetVoting-StreamProcessor-Role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: StreamProcessorPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                  - dynamodb:DescribeStream
+                  - dynamodb:ListStreams
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Votes/stream/*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:UpdateItem
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/VoteResults'
+
+  # Role para API Gateway
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GadgetVoting-ApiGateway-Role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+Outputs:
+  EmitVoteLambdaRoleArn:
+    Description: ARN del Role para Lambda EmitVote
+    Value: !GetAtt EmitVoteLambdaRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-EmitVoteLambdaRoleArn'
+
+  GetResultsLambdaRoleArn:
+    Description: ARN del Role para Lambda GetResults
+    Value: !GetAtt GetResultsLambdaRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-GetResultsLambdaRoleArn'
+
+  StreamProcessorLambdaRoleArn:
+    Description: ARN del Role para Lambda StreamProcessor
+    Value: !GetAtt StreamProcessorLambdaRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-StreamProcessorLambdaRoleArn'
+
+  ApiGatewayRoleArn:
+    Description: ARN del Role para API Gateway
+    Value: !GetAtt ApiGatewayRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiGatewayRoleArn'

@@ -1,0 +1,62 @@
+[
+  {
+    "gadgetId": "gadget-001",
+    "gadgetName": "SmartWatch Pro X",
+    "category": "Wearables",
+    "description": "Reloj inteligente con monitoreo avanzado de salud"
+  },
+  {
+    "gadgetId": "gadget-002",
+    "gadgetName": "AirPods Ultra",
+    "category": "Audio",
+    "description": "Auriculares inalámbricos con cancelación de ruido"
+  },
+  {
+    "gadgetId": "gadget-003",
+    "gadgetName": "Drone Phantom 5",
+    "category": "Fotografía",
+    "description": "Drone profesional con cámara 8K"
+  },
+  {
+    "gadgetId": "gadget-004",
+    "gadgetName": "VR Headset Elite",
+    "category": "Realidad Virtual",
+    "description": "Visor de realidad virtual de última generación"
+  },
+  {
+    "gadgetId": "gadget-005",
+    "gadgetName": "Robot Aspiradora AI",
+    "category": "Hogar Inteligente",
+    "description": "Aspiradora robótica con inteligencia artificial"
+  },
+  {
+    "gadgetId": "gadget-006",
+    "gadgetName": "Tablet Creator Pro",
+    "category": "Tablets",
+    "description": "Tablet profesional para diseñadores y artistas"
+  },
+  {
+    "gadgetId": "gadget-007",
+    "gadgetName": "Smart Speaker Max",
+    "category": "Audio",
+    "description": "Altavoz inteligente con asistente de voz"
+  },
+  {
+    "gadgetId": "gadget-008",
+    "gadgetName": "Gaming Console Next",
+    "category": "Gaming",
+    "description": "Consola de videojuegos de nueva generación"
+  },
+  {
+    "gadgetId": "gadget-009",
+    "gadgetName": "E-Reader Premium",
+    "category": "Lectura",
+    "description": "Lector de libros electrónicos con pantalla a color"
+  },
+  {
+    "gadgetId": "gadget-010",
+    "gadgetName": "Smart Thermostat",
+    "category": "Hogar Inteligente",
+    "description": "Termostato inteligente con aprendizaje automático"
+  }
+]

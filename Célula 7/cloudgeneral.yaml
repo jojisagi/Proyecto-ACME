@@ -1,0 +1,220 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: API CED-7 con HTTP API, Lambdas y DynamoDB.
+
+Resources:
+
+  #############################################
+  # IAM ROLE PARA LAMBDAS
+  #############################################
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: amazonlambdarole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+  #############################################
+  # TABLAS DYNAMODB
+  #############################################
+  VotesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Votes
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userID
+          AttributeType: S
+        - AttributeName: voteId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userID
+          KeyType: HASH
+        - AttributeName: voteId
+          KeyType: RANGE
+
+  VoteResultsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: VoteResults
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gadgetId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gadgetId
+          KeyType: HASH
+
+  GadgetPruebaTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: GadgetPrueba
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gadgetId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gadgetId
+          KeyType: HASH
+
+  #############################################
+  # LAMBDAS
+  #############################################
+  EmitVoteLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: emitvote
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: lambdas-ced-7
+        S3Key: emitvote.zip
+      Timeout: 10
+
+  GetResultsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: getResults
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: lambdas-ced-7
+        S3Key: getResults.zip
+      Timeout: 10
+
+  GadgetPruebaLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: gadgetPrueba
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: lambdas-ced-7
+        S3Key: gadgetPrueba.zip
+      Timeout: 10
+
+  #############################################
+  # HTTP API (v2)
+  #############################################
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: API-CED-7
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowMethods: ["GET", "POST"]
+        AllowOrigins: ["*"]
+        AllowHeaders: ["*"]
+
+  #############################################
+  # ROUTES
+  #############################################
+  VoteRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: POST /vote
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref VoteIntegration
+
+  ResultsRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: GET /results
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref ResultsIntegration
+
+  GadgetPruebaRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: GET /gadgetprueba
+      Target: !Join 
+        - /
+        - - integrations
+          - !Ref GadgetPruebaIntegration
+
+  #############################################
+  # INTEGRATIONS
+  #############################################
+  VoteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EmitVoteLambda.Arn}/invocations
+      PayloadFormatVersion: "2.0"
+
+  ResultsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetResultsLambda.Arn}/invocations
+      PayloadFormatVersion: "2.0"
+
+  GadgetPruebaIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GadgetPruebaLambda.Arn}/invocations
+      PayloadFormatVersion: "2.0"
+
+  #############################################
+  # STAGE
+  #############################################
+  ProdStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: prod2
+      ApiId: !Ref HttpApi
+      AutoDeploy: true
+
+  #############################################
+  # PERMISOS LAMBDA → API
+  #############################################
+  AllowInvokeEmitVote:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref EmitVoteLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*/vote
+
+  AllowInvokeResults:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GetResultsLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*/results
+
+  AllowInvokeGadgetPrueba:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GadgetPruebaLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*/gadgetprueba
+
+Outputs:
+  ApiInvokeURL:
+    Description: URL base del API HTTP
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod2/
