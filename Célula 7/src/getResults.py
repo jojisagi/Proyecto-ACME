@@ -1,25 +1,28 @@
-import json
-import os
+mport json
 import boto3
-from boto3.dynamodb.conditions import Key
+from decimal import Decimal
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['RESULTS_TABLE'])
+results_table = dynamodb.Table('VoteResults')
 
 def lambda_handler(event, context):
-    try:
-        # Escaneo completo (tabla pequeña)
-        response = table.scan()
+    response = results_table.scan()
+    results = response.get("Items", [])
 
-        items = response.get("Items", [])
-
+    if not results:
         return {
             "statusCode": 200,
-            "body": json.dumps(items)
+            "body": json.dumps({"message": "No se ha votado aún"})
         }
 
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(e)})
-        }
+    # Convertir Decimals a float para que json.dumps funcione
+    for item in results:
+        for key, value in item.items():
+            if isinstance(value, Decimal):
+                item[key] = float(value)
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({"votes": results})
+    }
+

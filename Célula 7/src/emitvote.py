@@ -1,54 +1,55 @@
 import json
-import os
-import time
-import uuid
 import boto3
+from datetime import datetime
+from botocore.exceptions import ClientError
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['VOTES_TABLE'])
+votes_table = dynamodb.Table('Votes')
+results_table = dynamodb.Table('VoteResults')
 
 def lambda_handler(event, context):
-    try:
-        body = json.loads(event.get("body", "{}"))
-        gadgetId = body.get("gadgetId")
 
-        if not gadgetId:
+    body = json.loads(event["body"])
+
+    user_id = body.get("userID")
+    vote_id = body.get("voteId")
+    gadget_id = body.get("gadgetId")
+
+    print("userID:", user_id)
+    print("voteId:", vote_id)
+    print("gadgetId:", gadget_id)
+
+    # Guardar voto solo si no existe un voto previo del mismo usuario
+    try:
+        votes_table.put_item(
+            Item={
+                'userID': user_id,       # PK única
+                'voteId': vote_id,       # solo un atributo
+                'gadgetId': gadget_id,
+                'timestamp': datetime.utcnow().isoformat()
+            },
+            ConditionExpression="attribute_not_exists(userID)"  # falla si ya existe
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
             return {
                 "statusCode": 400,
-                "body": json.dumps({"error": "Missing gadgetId"})
+                "body": json.dumps({"message": "User has already voted"})
             }
+        else:
+            raise
 
-        # Claims vienen desde API Gateway (Cognito)
-        claims = event["requestContext"]["authorizer"]["jwt"]["claims"]
-        userId = claims["sub"]  # ID del usuario autenticado
-
-        voteId = str(uuid.uuid4())
-        timestamp = int(time.time() * 1000)
-
-        # Inserción atómica para evitar doble voto
-        table.put_item(
-            Item={
-                "userId": userId,
-                "voteId": voteId,
-                "gadgetId": gadgetId,
-                "timestamp": timestamp
-            },
-            ConditionExpression="attribute_not_exists(userId)"
-        )
-
-        return {
-            "statusCode": 201,
-            "body": json.dumps({"message": "Vote registered", "voteId": voteId})
+    # Actualizar conteo en VoteResults
+    results_table.update_item(
+        Key={'gadgetId': gadget_id},
+        UpdateExpression="SET totalVotes = if_not_exists(totalVotes, :zero) + :inc",
+        ExpressionAttributeValues={
+            ":inc": 1,
+            ":zero": 0
         }
+    )
 
-    except dynamodb.meta.client.exceptions.ConditionalCheckFailedException:
-        return {
-            "statusCode": 409,
-            "body": json.dumps({"error": "User already voted"})
-        }
-
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(e)})
-        }
+    return {
+        "statusCode": 200,
+        "body": json.dumps({"message": "Vote recorded", "gadgetId": gadget_id})
+    }
