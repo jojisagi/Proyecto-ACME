@@ -16,26 +16,16 @@ Las pruebas están pensadas para ser realizadas en powershell y ser pegados tal 
 En el archivo en la carpeta Cédula 7/data/gadgetprueba-comando-powershell.txt se encuentra el comando que se debe usar para poder realizar la respectiva prueba.
 Se copia tal cual el comando completo y se pega en la línea de comando de powershell. Se espera la siguiente respuesta: 
 
-Gadget g1 insertado correctamente
-Respuesta: "Gadget g1 insertado correctamente"
-Gadget g2 insertado correctamente
-Respuesta: "Gadget g2 insertado correctamente"
-Gadget g3 insertado correctamente
-Respuesta: "Gadget g3 insertado correctamente"
-Gadget g4 insertado correctamente
-Respuesta: "Gadget g4 insertado correctamente"
-Gadget g5 insertado correctamente
-Respuesta: "Gadget g5 insertado correctamente"
-Gadget g6 insertado correctamente
-Respuesta: "Gadget g6 insertado correctamente"
-Gadget g7 insertado correctamente
-Respuesta: "Gadget g7 insertado correctamente"
-Gadget g8 insertado correctamente
-Respuesta: "Gadget g8 insertado correctamente"
-Gadget g9 insertado correctamente
-Respuesta: "Gadget g9 insertado correctamente"
-Gadget g10 insertado correctamente
-Respuesta: "Gadget g10 insertado correctamente"
+Gadget g1 insertado correctamente Respuesta: "Gadget g1 insertado correctamente"
+Gadget g2 insertado correctamente Respuesta: "Gadget g2 insertado correctamente"
+Gadget g3 insertado correctamente Respuesta: "Gadget g3 insertado correctamente"
+Gadget g4 insertado correctamente Respuesta: "Gadget g4 insertado correctamente"
+Gadget g5 insertado correctamente Respuesta: "Gadget g5 insertado correctamente"
+Gadget g6 insertado correctamente Respuesta: "Gadget g6 insertado correctamente"
+Gadget g7 insertado correctamente Respuesta: "Gadget g7 insertado correctamente"
+Gadget g8 insertado correctamente Respuesta: "Gadget g8 insertado correctamente"
+Gadget g9 insertado correctamente Respuesta: "Gadget g9 insertado correctamente"
+Gadget g10 insertado correctamente Respuesta: "Gadget g10 insertado correctamente"
 
 ##Pruebas votando
 En el archivo en la carpeta Cédula 7/data/votar-comando-powershell.txt se encuentra el comando que se debe usar para poder realizar la respectiva prueba.
