@@ -1,0 +1,55 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "=== PRE-BUILD ==="
+      - echo "Validando template de CloudFormation..."
+      - aws cloudformation validate-template --template-body file://iac/cloudformation-base.yaml
+      - echo "Template validado exitosamente"
+      - echo "Instalando dependencias Python..."
+      - mkdir -p build/lambdas
+  
+  build:
+    commands:
+      - echo "=== BUILD ==="
+      - echo "Empaquetando Lambda: image-processor"
+      - cd src/lambda/image-processor
+      - pip install -r requirements.txt -t package/
+      - cp lambda_function.py package/
+      - cd package
+      - zip -r ../../../../build/lambdas/image-processor.zip .
+      - cd ../../../../
+      
+      - echo "Empaquetando Lambda: api-handler"
+      - cd src/lambda/api-handler
+      - pip install -r requirements.txt -t package/
+      - cp lambda_function.py package/
+      - cd package
+      - zip -r ../../../../build/lambdas/api-handler.zip .
+      - cd ../../../../
+      
+      - echo "Copiando template de CloudFormation"
+      - cp iac/cloudformation-base.yaml build/
+      
+      - echo "Build completado"
+      - ls -la build/lambdas/
+  
+  post_build:
+    commands:
+      - echo "=== POST-BUILD ==="
+      - echo "Subiendo artefactos a S3..."
+      - aws s3 cp build/lambdas/ s3://$ARTIFACT_BUCKET/lambdas/ --recursive
+      - aws s3 cp build/cloudformation-base.yaml s3://$ARTIFACT_BUCKET/
+      - echo "Artefactos listos para despliegue"
+
+artifacts:
+  files:
+    - build/**/*
+    - iac/**/*
+    - src/**/*
+  name: BuildArtifact
+
+cache:
+  paths:
+    - '/root/.cache/pip/**/*'
