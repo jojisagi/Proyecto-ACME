@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "pre-prod"
+  },
+  {
+    "ParameterKey": "VPCId",
+    "ParameterValue": "vpc-XXXXXXXXX"
+  },
+  {
+    "ParameterKey": "PrivateSubnet1",
+    "ParameterValue": "subnet-XXXXXXXXX"
+  },
+  {
+    "ParameterKey": "PrivateSubnet2",
+    "ParameterValue": "subnet-YYYYYYYYY"
+  },
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "acme-image-handler"
+  }
+]
