@@ -1,0 +1,317 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Stack Principal - Sistema de Votación Gadget del Año'
+
+Parameters:
+  IamStackName:
+    Type: String
+    Default: gadget-voting-iam
+    Description: Nombre del stack IAM
+
+  EmitVoteLambdaS3Bucket:
+    Type: String
+    Description: Bucket S3 con el código de las Lambdas
+
+  EmitVoteLambdaS3Key:
+    Type: String
+    Default: lambda/emit-vote.zip
+    Description: Key del archivo ZIP de EmitVote
+
+  GetResultsLambdaS3Key:
+    Type: String
+    Default: lambda/get-results.zip
+    Description: Key del archivo ZIP de GetResults
+
+  StreamProcessorLambdaS3Key:
+    Type: String
+    Default: lambda/stream-processor.zip
+    Description: Key del archivo ZIP de StreamProcessor
+
+Resources:
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: GadgetVotingUserPool
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: GadgetVotingClient
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  # DynamoDB Tabla Votes
+  VotesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Votes
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: voteId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: voteId
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  # DynamoDB Tabla VoteResults
+  VoteResultsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: VoteResults
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gadgetId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gadgetId
+          KeyType: HASH
+
+  # Lambda EmitVote
+  EmitVoteLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GadgetVoting-EmitVote
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role:
+        Fn::ImportValue: !Sub '${IamStackName}-EmitVoteLambdaRoleArn'
+      Code:
+        S3Bucket: !Ref EmitVoteLambdaS3Bucket
+        S3Key: !Ref EmitVoteLambdaS3Key
+      Environment:
+        Variables:
+          VOTES_TABLE: !Ref VotesTable
+          USER_POOL_ID: !Ref UserPool
+      Timeout: 30
+
+  # Lambda GetResults
+  GetResultsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GadgetVoting-GetResults
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role:
+        Fn::ImportValue: !Sub '${IamStackName}-GetResultsLambdaRoleArn'
+      Code:
+        S3Bucket: !Ref EmitVoteLambdaS3Bucket
+        S3Key: !Ref GetResultsLambdaS3Key
+      Environment:
+        Variables:
+          RESULTS_TABLE: !Ref VoteResultsTable
+      Timeout: 30
+
+  # Lambda StreamProcessor
+  StreamProcessorLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GadgetVoting-StreamProcessor
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role:
+        Fn::ImportValue: !Sub '${IamStackName}-StreamProcessorLambdaRoleArn'
+      Code:
+        S3Bucket: !Ref EmitVoteLambdaS3Bucket
+        S3Key: !Ref StreamProcessorLambdaS3Key
+      Environment:
+        Variables:
+          RESULTS_TABLE: !Ref VoteResultsTable
+      Timeout: 60
+
+  # Event Source Mapping para DynamoDB Stream
+  StreamEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt VotesTable.StreamArn
+      FunctionName: !GetAtt StreamProcessorLambda.Arn
+      StartingPosition: LATEST
+      BatchSize: 100
+
+  # API Gateway REST API
+  VotingApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: GadgetVotingAPI
+      Description: API para Sistema de Votación
+
+  # Cognito Authorizer
+  CognitoAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref VotingApi
+      ProviderARNs:
+        - !GetAtt UserPool.Arn
+
+  # Resource /vote
+  VoteResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref VotingApi
+      ParentId: !GetAtt VotingApi.RootResourceId
+      PathPart: vote
+
+  # POST /vote
+  VotePostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VotingApi
+      ResourceId: !Ref VoteResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EmitVoteLambda.Arn}/invocations'
+
+  # Resource /results
+  ResultsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref VotingApi
+      ParentId: !GetAtt VotingApi.RootResourceId
+      PathPart: results
+
+  # GET /results
+  ResultsGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VotingApi
+      ResourceId: !Ref ResultsResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetResultsLambda.Arn}/invocations'
+
+  # OPTIONS /vote (CORS)
+  VoteOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VotingApi
+      ResourceId: !Ref VoteResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # OPTIONS /results (CORS)
+  ResultsOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VotingApi
+      ResourceId: !Ref ResultsResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # API Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - VotePostMethod
+      - ResultsGetMethod
+      - VoteOptionsMethod
+      - ResultsOptionsMethod
+    Properties:
+      RestApiId: !Ref VotingApi
+
+  # API Stage
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref VotingApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: prod
+
+  # Lambda Permissions
+  EmitVoteLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EmitVoteLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${VotingApi}/*'
+
+  GetResultsLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GetResultsLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${VotingApi}/*'
+
+Outputs:
+  ApiEndpoint:
+    Description: URL del API Gateway
+    Value: !Sub 'https://${VotingApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+
+  UserPoolId:
+    Description: ID del Cognito User Pool
+    Value: !Ref UserPool
+
+  UserPoolClientId:
+    Description: ID del Cognito User Pool Client
+    Value: !Ref UserPoolClient
+
+  VotesTableName:
+    Description: Nombre de la tabla Votes
+    Value: !Ref VotesTable
+
+  VoteResultsTableName:
+    Description: Nombre de la tabla VoteResults
+    Value: !Ref VoteResultsTable
