@@ -1,0 +1,67 @@
+------------vote
+
+$body = @{
+    userID = "123"
+    voteId = "v1"
+    gadgetId = "g1"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/pro2/vote" `
+    -Method POST `
+    -Body $body `
+    -ContentType "application/json"
+
+__
+
+# Lista de 10 gadgets
+$gadgets = @(
+    @{ "gadgetId"="g1"; "nombre"="Smart Watch" },
+    @{ "gadgetId"="g2"; "nombre"="Auriculares Bluetooth" },
+    @{ "gadgetId"="g3"; "nombre"="Camara de Seguridad" },
+    @{ "gadgetId"="g4"; "nombre"="Drone Fotografico" },
+    @{ "gadgetId"="g5"; "nombre"="Tablet 10 pulgadas" },
+    @{ "gadgetId"="g6"; "nombre"="Altavoz Inteligente" },
+    @{ "gadgetId"="g7"; "nombre"="Bateria Externa" },
+    @{ "gadgetId"="g8"; "nombre"="Reloj Deportivo" },
+    @{ "gadgetId"="g9"; "nombre"="Lampara Inteligente" },
+    @{ "gadgetId"="g10"; "nombre"="Camara de Accion" }
+)
+
+# Generar 50 usuarios (user1, user2, ..., user50)
+$users = 1..50 | ForEach-Object { "user$_" }
+
+# URL de tu API Gateway para votes
+$voteUrl = "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/pro2/vote"
+
+# Generar 50 votos
+for ($i = 1; $i -le 50; $i++) {
+    # Seleccionar gadget aleatorio
+    $gadget = Get-Random -InputObject $gadgets
+
+    # Asignar un usuario único
+    $userID = $users[$i-1]
+
+    # VoteId único
+    $voteId = "v$i"
+
+    # Crear body JSON
+    $body = @{
+        userID = $userID
+        voteId = $voteId
+        gadgetId = $gadget.gadgetId
+    } | ConvertTo-Json
+
+    try {
+        $response = Invoke-RestMethod -Uri $voteUrl -Method Post -Body $body -ContentType "application/json"
+        Write-Host "Voto $voteId por $userID para gadget $($gadget.gadgetId) insertado correctamente"
+    } catch {
+        Write-Host "Error al insertar voto $voteId por $userID para $($gadget.gadgetId): $_"
+    }
+}
+
+
+---------------------result
+Invoke-RestMethod -Uri "https://12fpv92kz0.execute-api.us-east-1.amazonaws.com/pro2/results" -Method GET
+
+
+
