@@ -1,0 +1,68 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "=== Fase Install ==="
+      - echo "Instalando dependencias de Python..."
+      - |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt -t ./python_dependencies
+          echo "✓ Dependencias instaladas"
+        else
+          echo "No se encontró requirements.txt, continuando sin dependencias adicionales"
+        fi
+      - echo "Instalando AWS CLI y herramientas de validación..."
+      - pip install cfn-lint --upgrade
+      
+  pre_build:
+    commands:
+      - echo "=== Fase Pre-build ==="
+      - echo "Validando sintaxis de plantillas CloudFormation..."
+      - |
+        echo "Validando iac/iam_stack.yml..."
+        aws cloudformation validate-template --template-body file://iac/iam_stack.yml || exit 1
+        echo "✓ iam_stack.yml válido"
+      - |
+        echo "Validando iac/main_stack.yml..."
+        aws cloudformation validate-template --template-body file://iac/main_stack.yml || exit 1
+        echo "✓ main_stack.yml válido"
+      - |
+        echo "Ejecutando cfn-lint en plantillas..."
+        cfn-lint iac/*.yml || echo "⚠ Advertencias de cfn-lint detectadas (no crítico)"
+      - echo "✓ Validación de plantillas completada"
+      
+  build:
+    commands:
+      - echo "=== Fase Build ==="
+      - echo "Empaquetando funciones Lambda..."
+      - chmod +x scripts/package_lambdas.sh
+      - cd scripts && ./package_lambdas.sh && cd ..
+      - echo "✓ Funciones Lambda empaquetadas"
+      - |
+        echo "Verificando archivos ZIP generados:"
+        ls -lh dist/*.zip
+      - echo "✓ Build completado exitosamente"
+      
+  post_build:
+    commands:
+      - echo "=== Fase Post-build ==="
+      - echo "Preparando artefactos para despliegue..."
+      - |
+        echo "Contenido del directorio dist/:"
+        ls -la dist/
+      - echo "✓ Post-build completado"
+
+artifacts:
+  files:
+    - 'iac/iam_stack.yml'
+    - 'iac/main_stack.yml'
+    - 'dist/scheduler_manager.zip'
+    - 'dist/order_executor.zip'
+  name: scheduling-system-artifacts
+  
+cache:
+  paths:
+    - '/root/.cache/pip/**/*'
