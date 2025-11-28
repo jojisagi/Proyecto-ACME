@@ -18,38 +18,38 @@ Parameters:
   IAMRolesStackName:
     Type: String
     Description: Name of the IAM roles CloudFormation stack
-    Default: purchase-orders-iam-roles
+    Default: iamroles
 
 Resources:
-  # KMS Key for encryption
-  DataEncryptionKey:
-    Type: AWS::KMS::Key
-    Properties:
-      Description: Encryption key for purchase order data
-      KeyPolicy:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: Enable IAM policies
-            Effect: Allow
-            Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-            Action: 'kms:*'
-            Resource: '*'
-          - Sid: Allow Lambda to use key
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action:
-              - 'kms:Decrypt'
-              - 'kms:Encrypt'
-              - 'kms:GenerateDataKey'
-            Resource: '*'
+  # # KMS Key for encryption
+  # DataEncryptionKey:
+  #   Type: AWS::KMS::Key
+  #   Properties:
+  #     Description: Encryption key for purchase order data
+  #     KeyPolicy:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Sid: Enable IAM policies
+  #           Effect: Allow
+  #           Principal:
+  #             AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+  #           Action: 'kms:*'
+  #           Resource: '*'
+  #         - Sid: Allow Lambda to use key
+  #           Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action:
+  #             - 'kms:Decrypt'
+  #             - 'kms:Encrypt'
+  #             - 'kms:GenerateDataKey'
+  #           Resource: '*'
 
-  DataEncryptionKeyAlias:
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName: !Sub 'alias/purchase-orders-${Environment}'
-      TargetKeyId: !Ref DataEncryptionKey
+  # DataEncryptionKeyAlias:
+  #   Type: AWS::KMS::Alias
+  #   Properties:
+  #     AliasName: !Sub 'alias/purchase-orders-${Environment}'
+  #     TargetKeyId: !Ref DataEncryptionKey
 
   # VPC Configuration
   VPC:
@@ -131,7 +131,7 @@ Resources:
       SSESpecification:
         SSEEnabled: true
         SSEType: KMS
-        KMSMasterKeyId: !Ref DataEncryptionKey
+#        KMSMasterKeyId: !Ref DataEncryptionKey
       AttributeDefinitions:
         - AttributeName: orderId
           AttributeType: S
@@ -164,7 +164,7 @@ Resources:
       SSESpecification:
         SSEEnabled: true
         SSEType: KMS
-        KMSMasterKeyId: !Ref DataEncryptionKey
+#        KMSMasterKeyId: !Ref DataEncryptionKey
       AttributeDefinitions:
         - AttributeName: aggregationKey
           AttributeType: S
@@ -201,10 +201,10 @@ Resources:
         - ALLOW_REFRESH_TOKEN_AUTH
 
   # EventBridge
-  OrderEventBus:
-    Type: AWS::Events::EventBus
-    Properties:
-      Name: !Sub 'purchase-orders-${Environment}'
+  # OrderEventBus:
+  #   Type: AWS::Events::EventBus
+  #   Properties:
+  #     Name: !Sub 'purchase-orders-${Environment}'
 
   # Lambda Functions
   OrderProcessorFunction:
@@ -544,27 +544,27 @@ Resources:
       SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*'
 
   # EventBridge Rule
-  OrderEventRule:
-    Type: AWS::Events::Rule
-    Properties:
-      EventBusName: !Ref OrderEventBus
-      EventPattern:
-        source:
-          - ecommerce.system
-        detail-type:
-          - OrderPlaced
-      State: ENABLED
-      Targets:
-        - Arn: !GetAtt OrderProcessorFunction.Arn
-          Id: OrderProcessorTarget
+  # OrderEventRule:
+  #   Type: AWS::Events::Rule
+  #   Properties:
+  #     EventBusName: default
+  #     EventPattern:
+  #       source:
+  #         - ecommerce.system
+  #       detail-type:
+  #         - OrderPlaced
+  #     State: ENABLED
+  #     Targets:
+  #       - Arn: !GetAtt OrderProcessorFunction.Arn
+  #         Id: OrderProcessorTarget
 
-  EventBridgeLambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref OrderProcessorFunction
-      Action: lambda:InvokeFunction
-      Principal: events.amazonaws.com
-      SourceArn: !GetAtt OrderEventRule.Arn
+  # EventBridgeLambdaPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     FunctionName: !Ref OrderProcessorFunction
+  #     Action: lambda:InvokeFunction
+  #     Principal: events.amazonaws.com
+  #     SourceArn: !GetAtt OrderEventRule.Arn
 
 Outputs:
   ApiEndpoint:
@@ -587,7 +587,7 @@ Outputs:
 
   EventBusName:
     Description: EventBridge Event Bus Name
-    Value: !Ref OrderEventBus
+    Value: default
     Export:
       Name: !Sub '${AWS::StackName}-EventBusName'
 
