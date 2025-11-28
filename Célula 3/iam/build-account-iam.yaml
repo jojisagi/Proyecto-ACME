@@ -1,0 +1,281 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM Roles y Permisos para Cuenta BUILD - Célula 3 Acme Image Handler'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: acme-image-handler
+    Description: Nombre del proyecto
+  
+  SandboxAccountId:
+    Type: String
+    Description: Account ID de la cuenta Sandbox
+  
+  ProdAccountId:
+    Type: String
+    Description: Account ID de la cuenta Producción
+
+Resources:
+  # ==================== CODEPIPELINE ROLE ====================
+  
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-codepipeline-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelineBasePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # S3 Access para artefactos
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                  - s3:GetBucketLocation
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::${ProjectName}-artifacts-${AWS::AccountId}'
+                  - !Sub 'arn:aws:s3:::${ProjectName}-artifacts-${AWS::AccountId}/*'
+              
+              # CodeBuild Access
+              - Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                  - codebuild:StopBuild
+                Resource:
+                  - !Sub 'arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${ProjectName}-*'
+              
+              # CloudFormation Access
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:UpdateStack
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:SetStackPolicy
+                  - cloudformation:ValidateTemplate
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeStackResources
+                Resource: '*'
+              
+              # IAM PassRole
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - !GetAtt CloudFormationServiceRole.Arn
+              
+              # Cross-Account Assume Role
+              - Effect: Allow
+                Action:
+                  - sts:AssumeRole
+                Resource:
+                  - !Sub 'arn:aws:iam::${SandboxAccountId}:role/${ProjectName}-cross-account-role'
+                  - !Sub 'arn:aws:iam::${ProdAccountId}:role/${ProjectName}-cross-account-role'
+              
+              # CodePipeline específico
+              - Effect: Allow
+                Action:
+                  - codepipeline:*
+                Resource:
+                  - !Sub 'arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${ProjectName}-*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: build
+
+  # ==================== CODEBUILD ROLE ====================
+  
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-codebuild-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildBasePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # CloudWatch Logs
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-*'
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-*:*'
+              
+              # S3 Access para artefactos
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::${ProjectName}-artifacts-${AWS::AccountId}'
+                  - !Sub 'arn:aws:s3:::${ProjectName}-artifacts-${AWS::AccountId}/*'
+              
+              # CloudFormation Validate
+              - Effect: Allow
+                Action:
+                  - cloudformation:ValidateTemplate
+                Resource: '*'
+              
+              # ECR (si se necesita para imágenes Docker)
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                Resource: '*'
+              
+              # CodeBuild específico
+              - Effect: Allow
+                Action:
+                  - codebuild:CreateReportGroup
+                  - codebuild:CreateReport
+                  - codebuild:UpdateReport
+                  - codebuild:BatchPutTestCases
+                  - codebuild:BatchPutCodeCoverages
+                Resource:
+                  - !Sub 'arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/${ProjectName}-*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: build
+
+  # ==================== CLOUDFORMATION ROLE ====================
+  
+  CloudFormationServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-cloudformation-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: build
+
+  # ==================== S3 BUCKET PARA ARTEFACTOS ====================
+  
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ProjectName}-artifacts-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldArtifacts
+            Status: Enabled
+            ExpirationInDays: 30
+            NoncurrentVersionExpirationInDays: 7
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: build
+
+  ArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCodePipelineAccess
+            Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt CodePipelineServiceRole.Arn
+                - !GetAtt CodeBuildServiceRole.Arn
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - s3:PutObject
+            Resource: !Sub '${ArtifactsBucket.Arn}/*'
+          
+          - Sid: AllowCrossAccountAccess
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub 'arn:aws:iam::${SandboxAccountId}:root'
+                - !Sub 'arn:aws:iam::${ProdAccountId}:root'
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub '${ArtifactsBucket.Arn}/*'
+
+Outputs:
+  CodePipelineRoleArn:
+    Description: ARN del rol de CodePipeline
+    Value: !GetAtt CodePipelineServiceRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-codepipeline-role-arn'
+  
+  CodeBuildRoleArn:
+    Description: ARN del rol de CodeBuild
+    Value: !GetAtt CodeBuildServiceRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-codebuild-role-arn'
+  
+  CloudFormationRoleArn:
+    Description: ARN del rol de CloudFormation
+    Value: !GetAtt CloudFormationServiceRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-cloudformation-role-arn'
+  
+  ArtifactsBucketName:
+    Description: Nombre del bucket de artefactos
+    Value: !Ref ArtifactsBucket
+    Export:
+      Name: !Sub '${ProjectName}-artifacts-bucket'
+  
+  ArtifactsBucketArn:
+    Description: ARN del bucket de artefactos
+    Value: !GetAtt ArtifactsBucket.Arn
+    Export:
+      Name: !Sub '${ProjectName}-artifacts-bucket-arn'
