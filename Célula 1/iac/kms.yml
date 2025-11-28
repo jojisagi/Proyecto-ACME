@@ -1,0 +1,337 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'KMS Customer Master Keys (CMKs) for cartoon-rekognition solution - S3, DynamoDB, CloudWatch Logs, and Secrets Manager encryption'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name (sandbox, preprod, prod)
+    AllowedValues:
+      - sandbox
+      - preprod
+      - prod
+    Default: sandbox
+
+  ProjectName:
+    Type: String
+    Description: Project name for resource naming
+    Default: cartoon-rekognition
+
+Resources:
+  # CMK for S3 Bucket Encryption
+  S3KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub 'KMS key for S3 bucket encryption in ${Environment} environment'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          # Allow root account full access (required for key management)
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          
+          # Allow S3 service to use the key
+          - Sid: Allow S3 Service
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+            Resource: '*'
+            Condition:
+              StringEquals:
+                'kms:ViaService': !Sub 's3.${AWS::Region}.amazonaws.com'
+          
+          # Allow Lambda roles to encrypt/decrypt S3 objects
+          - Sid: Allow Lambda Access
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+            Resource: '*'
+            Condition:
+              StringLike:
+                'aws:PrincipalArn': !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ProjectName}-*'
+      
+      EnableKeyRotation: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-s3-key-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Purpose
+          Value: S3 Encryption
+
+  S3KMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-s3-${Environment}'
+      TargetKeyId: !Ref S3KMSKey
+
+  # CMK for DynamoDB Table Encryption
+  DynamoDBKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub 'KMS key for DynamoDB table encryption in ${Environment} environment'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          # Allow root account full access
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          
+          # Allow DynamoDB service to use the key
+          - Sid: Allow DynamoDB Service
+            Effect: Allow
+            Principal:
+              Service: dynamodb.amazonaws.com
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:DescribeKey'
+              - 'kms:CreateGrant'
+            Resource: '*'
+            Condition:
+              StringEquals:
+                'kms:ViaService': !Sub 'dynamodb.${AWS::Region}.amazonaws.com'
+          
+          # Allow Lambda roles to decrypt DynamoDB data
+          - Sid: Allow Lambda Access
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:DescribeKey'
+            Resource: '*'
+            Condition:
+              StringLike:
+                'aws:PrincipalArn': !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ProjectName}-*'
+      
+      EnableKeyRotation: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-dynamodb-key-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Purpose
+          Value: DynamoDB Encryption
+
+  DynamoDBKMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-dynamodb-${Environment}'
+      TargetKeyId: !Ref DynamoDBKMSKey
+
+  # CMK for CloudWatch Logs Encryption
+  CloudWatchLogsKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub 'KMS key for CloudWatch Logs encryption in ${Environment} environment'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          # Allow root account full access
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          
+          # Allow CloudWatch Logs service to use the key
+          - Sid: Allow CloudWatch Logs Service
+            Effect: Allow
+            Principal:
+              Service: !Sub 'logs.${AWS::Region}.amazonaws.com'
+            Action:
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey*'
+              - 'kms:CreateGrant'
+              - 'kms:DescribeKey'
+            Resource: '*'
+            Condition:
+              ArnLike:
+                'kms:EncryptionContext:aws:logs:arn': !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+          
+          # Allow Lambda roles to write encrypted logs
+          - Sid: Allow Lambda Access
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+            Resource: '*'
+            Condition:
+              StringLike:
+                'aws:PrincipalArn': !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ProjectName}-*'
+      
+      EnableKeyRotation: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-logs-key-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Purpose
+          Value: CloudWatch Logs Encryption
+
+  CloudWatchLogsKMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-logs-${Environment}'
+      TargetKeyId: !Ref CloudWatchLogsKMSKey
+
+  # CMK for Secrets Manager Encryption
+  SecretsManagerKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub 'KMS key for Secrets Manager encryption in ${Environment} environment'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          # Allow root account full access
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          
+          # Allow Secrets Manager service to use the key
+          - Sid: Allow Secrets Manager Service
+            Effect: Allow
+            Principal:
+              Service: secretsmanager.amazonaws.com
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+              - 'kms:CreateGrant'
+            Resource: '*'
+            Condition:
+              StringEquals:
+                'kms:ViaService': !Sub 'secretsmanager.${AWS::Region}.amazonaws.com'
+          
+          # Allow Lambda roles to retrieve secrets
+          - Sid: Allow Lambda Access
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:DescribeKey'
+            Resource: '*'
+            Condition:
+              StringLike:
+                'aws:PrincipalArn': !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ProjectName}-*'
+      
+      EnableKeyRotation: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-secrets-key-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Purpose
+          Value: Secrets Manager Encryption
+
+  SecretsManagerKMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-secrets-${Environment}'
+      TargetKeyId: !Ref SecretsManagerKMSKey
+
+Outputs:
+  # S3 KMS Key Outputs
+  S3KMSKeyId:
+    Description: KMS Key ID for S3 encryption
+    Value: !Ref S3KMSKey
+    Export:
+      Name: !Sub '${AWS::StackName}-S3-KeyId'
+
+  S3KMSKeyArn:
+    Description: KMS Key ARN for S3 encryption
+    Value: !GetAtt S3KMSKey.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-S3-KeyArn'
+
+  S3KMSKeyAlias:
+    Description: KMS Key Alias for S3 encryption
+    Value: !Ref S3KMSKeyAlias
+    Export:
+      Name: !Sub '${AWS::StackName}-S3-KeyAlias'
+
+  # DynamoDB KMS Key Outputs
+  DynamoDBKMSKeyId:
+    Description: KMS Key ID for DynamoDB encryption
+    Value: !Ref DynamoDBKMSKey
+    Export:
+      Name: !Sub '${AWS::StackName}-DynamoDB-KeyId'
+
+  DynamoDBKMSKeyArn:
+    Description: KMS Key ARN for DynamoDB encryption
+    Value: !GetAtt DynamoDBKMSKey.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-DynamoDB-KeyArn'
+
+  DynamoDBKMSKeyAlias:
+    Description: KMS Key Alias for DynamoDB encryption
+    Value: !Ref DynamoDBKMSKeyAlias
+    Export:
+      Name: !Sub '${AWS::StackName}-DynamoDB-KeyAlias'
+
+  # CloudWatch Logs KMS Key Outputs
+  CloudWatchLogsKMSKeyId:
+    Description: KMS Key ID for CloudWatch Logs encryption
+    Value: !Ref CloudWatchLogsKMSKey
+    Export:
+      Name: !Sub '${AWS::StackName}-Logs-KeyId'
+
+  CloudWatchLogsKMSKeyArn:
+    Description: KMS Key ARN for CloudWatch Logs encryption
+    Value: !GetAtt CloudWatchLogsKMSKey.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-Logs-KeyArn'
+
+  CloudWatchLogsKMSKeyAlias:
+    Description: KMS Key Alias for CloudWatch Logs encryption
+    Value: !Ref CloudWatchLogsKMSKeyAlias
+    Export:
+      Name: !Sub '${AWS::StackName}-Logs-KeyAlias'
+
+  # Secrets Manager KMS Key Outputs
+  SecretsManagerKMSKeyId:
+    Description: KMS Key ID for Secrets Manager encryption
+    Value: !Ref SecretsManagerKMSKey
+    Export:
+      Name: !Sub '${AWS::StackName}-Secrets-KeyId'
+
+  SecretsManagerKMSKeyArn:
+    Description: KMS Key ARN for Secrets Manager encryption
+    Value: !GetAtt SecretsManagerKMSKey.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-Secrets-KeyArn'
+
+  SecretsManagerKMSKeyAlias:
+    Description: KMS Key Alias for Secrets Manager encryption
+    Value: !Ref SecretsManagerKMSKeyAlias
+    Export:
+      Name: !Sub '${AWS::StackName}-Secrets-KeyAlias'

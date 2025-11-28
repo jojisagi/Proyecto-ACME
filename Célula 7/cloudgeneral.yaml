@@ -1,26 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: API CED-7 con HTTP API, Lambdas y DynamoDB.
 
-Resources:
+#############################################
+# PARAMETER PARA EL ROL EXISTENTE
+#############################################
+Parameters:
+  LambdaExecutionRoleArn:
+    Type: String
+    Description: ARN del rol de Lambda ya existente que se usará para todas las funciones
 
-  #############################################
-  # IAM ROLE PARA LAMBDAS
-  #############################################
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: amazonlambdarole
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+Resources:
 
   #############################################
   # TABLAS DYNAMODB
@@ -66,7 +55,7 @@ Resources:
           KeyType: HASH
 
   #############################################
-  # LAMBDAS
+  # LAMBDAS (USANDO EL ROL EXISTENTE)
   #############################################
   EmitVoteLambda:
     Type: AWS::Lambda::Function
@@ -74,7 +63,7 @@ Resources:
       FunctionName: emitvote
       Runtime: python3.12
       Handler: lambda_function.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: !Ref LambdaExecutionRoleArn
       Code:
         S3Bucket: lambdas-ced-7
         S3Key: emitvote.zip
@@ -86,7 +75,7 @@ Resources:
       FunctionName: getResults
       Runtime: python3.12
       Handler: lambda_function.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: !Ref LambdaExecutionRoleArn
       Code:
         S3Bucket: lambdas-ced-7
         S3Key: getResults.zip
@@ -98,7 +87,7 @@ Resources:
       FunctionName: gadgetPrueba
       Runtime: python3.12
       Handler: lambda_function.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: !Ref LambdaExecutionRoleArn
       Code:
         S3Bucket: lambdas-ced-7
         S3Key: gadgetPrueba.zip
@@ -144,7 +133,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: GET /gadgetprueba
+      RouteKey: POST /gadgetprueba
       Target: !Join 
         - /
         - - integrations
@@ -218,3 +207,4 @@ Outputs:
   ApiInvokeURL:
     Description: URL base del API HTTP
     Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod2/
+

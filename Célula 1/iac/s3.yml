@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'S3 Bucket for Cartoon Rekognition - Image storage with encryption, versioning, lifecycle policies, and event notifications'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name (sandbox, preprod, prod)
+    AllowedValues:
+      - sandbox
+      - preprod
+      - prod
+    Default: sandbox
+
+  ProjectName:
+    Type: String
+    Description: Project name for resource naming
+    Default: cartoon-rekognition
+
+  KMSStackName:
+    Type: String
+    Description: Name of the KMS CloudFormation stack
+    Default: cartoon-rekognition-kms
+
+  LogRetentionDays:
+    Type: Number
+    Description: Number of days to retain access logs
+    Default: 90
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - Environment
+          - ProjectName
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - KMSStackName
+      - Label:
+          default: Logging Configuration
+        Parameters:
+          - LogRetentionDays
+
+Resources:
+  # S3 Bucket for Access Logs
+  AccessLogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ProjectName}-access-logs-${Environment}-${AWS::AccountId}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldLogs
+            Status: Enabled
+            ExpirationInDays: !Ref LogRetentionDays
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-access-logs-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Purpose
+          Value: Access Logs
+
+  # Bucket Policy for Access Logs Bucket
+  AccessLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AccessLogsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: S3ServerAccessLogsPolicy
+            Effect: Allow
+            Principal:
+              Service: logging.s3.amazonaws.com
+            Action: 's3:PutObject'
+            Resource: !Sub '${AccessLogsBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                'aws:SourceAccount': !Ref AWS::AccountId
+
+  # Main S3 Bucket for Images
+  ImagesBucket:
+    Type: AWS::S3::Bucket
+    DependsOn: AccessLogsBucketPolicy
+    Properties:
+      BucketName: !Sub '${ProjectName}-images-${Environment}-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID:
+                Fn::ImportValue: !Sub '${KMSStackName}-S3-KeyId'
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LoggingConfiguration:
+        DestinationBucketName: !Ref AccessLogsBucket
+        LogFilePrefix: !Sub '${ProjectName}-images/'
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToInfrequentAccess
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA
+          - Id: TransitionToGlacier
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 90
+                StorageClass: GLACIER
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionTransitions:
+              - TransitionInDays: 30
+                StorageClass: GLACIER
+            NoncurrentVersionExpirationInDays: 365
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ProjectName}-s3-event-processor-${Environment}'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .jpg
+          - Event: 's3:ObjectCreated:*'
+            Function: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ProjectName}-s3-event-processor-${Environment}'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .jpeg
+          - Event: 's3:ObjectCreated:*'
+            Function: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ProjectName}-s3-event-processor-${Environment}'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .png
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-images-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Purpose
+          Value: Image Storage
+
+  # Bucket Policy - Deny Public Access and Enforce Encryption
+  ImagesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ImagesBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # Deny all public access
+          - Sid: DenyPublicAccess
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt ImagesBucket.Arn
+              - !Sub '${ImagesBucket.Arn}/*'
+            Condition:
+              StringNotEquals:
+                'aws:PrincipalAccount': !Ref AWS::AccountId
+          
+          # Enforce encryption in transit
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt ImagesBucket.Arn
+              - !Sub '${ImagesBucket.Arn}/*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': false
+          
+          # Enforce encryption at rest
+          - Sid: DenyUnencryptedObjectUploads
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:PutObject'
+            Resource: !Sub '${ImagesBucket.Arn}/*'
+            Condition:
+              StringNotEquals:
+                's3:x-amz-server-side-encryption': 'aws:kms'
+          
+          # Allow Lambda role to read objects
+          - Sid: AllowLambdaReadAccess
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ProjectName}-s3-event-processor-role-${Environment}'
+            Action:
+              - 's3:GetObject'
+              - 's3:GetObjectVersion'
+            Resource: !Sub '${ImagesBucket.Arn}/*'
+          
+          # Allow presigned URL generation Lambda to put objects
+          - Sid: AllowPresignedUrlLambda
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ProjectName}-generate-presigned-url-role-${Environment}'
+            Action:
+              - 's3:PutObject'
+              - 's3:PutObjectAcl'
+            Resource: !Sub '${ImagesBucket.Arn}/*'
+
+Outputs:
+  ImagesBucketName:
+    Description: Name of the S3 bucket for images
+    Value: !Ref ImagesBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-ImagesBucketName'
+
+  ImagesBucketArn:
+    Description: ARN of the S3 bucket for images
+    Value: !GetAtt ImagesBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-ImagesBucketArn'
+
+  AccessLogsBucketName:
+    Description: Name of the S3 bucket for access logs
+    Value: !Ref AccessLogsBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-AccessLogsBucketName'
+
+  AccessLogsBucketArn:
+    Description: ARN of the S3 bucket for access logs
+    Value: !GetAtt AccessLogsBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-AccessLogsBucketArn'
