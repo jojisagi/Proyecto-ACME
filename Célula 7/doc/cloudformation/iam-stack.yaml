@@ -95,8 +95,7 @@ Resources:
             Principal:
               Service: apigateway.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+      ManagedPolicyArns: "*"
 
 Outputs:
   EmitVoteLambdaRoleArn:
