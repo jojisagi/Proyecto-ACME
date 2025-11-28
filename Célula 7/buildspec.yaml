@@ -1,0 +1,50 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+    commands:
+      - echo "== Instalando herramientas para validación =="
+      - pip install cfn-lint
+
+  pre_build:
+    commands:
+      - echo "== Validando plantilla CloudFormation =="
+      - cfn-lint cloudgeneral.yaml
+      - aws cloudformation validate-template --template-body file://cloudgeneral.yaml
+
+  build:
+    commands:
+      - echo "== Empaquetando Lambdas =="
+
+      # Entramos a src por comodidad
+      - cd src
+
+      - echo "Zipeando emitvote.py..."
+      - zip ../emitvote.zip emitvote.py
+
+      - echo "Zipeando gadgetPrueba.py..."
+      - zip ../gadgetPrueba.zip gadgetPrueba.py
+
+      - echo "Zipeando getResults.py..."
+      - zip ../getResults.zip getResults.py
+
+      - echo "Zipeando streamProcessor.py..."
+      - zip ../streamProcessor.zip streamProcessor.py
+
+      - cd ..
+
+  post_build:
+    commands:
+      - echo "== Build completado. Artefactos listos para CodePipeline =="
+      
+artifacts:
+  files:
+    - emitvote.zip
+    - gadgetPrueba.zip
+    - getResults.zip
+    - streamProcessor.zip
+    - cloudgeneral.yaml
+  discard-paths: yes
+
