@@ -1,452 +1,454 @@
-[
-  {
-    "description": "Standard Order 1 - Electronics",
-    "orderId": "ORD-001",
-    "customerId": "CUST-100",
-    "gadgetId": "GAD-PHONE-X",
-    "category": "Electronics",
-    "quantity": 1,
-    "price": 999.99
-  },
-  {
-    "description": "Standard Order 2 - Electronics",
-    "orderId": "ORD-002",
-    "customerId": "CUST-101",
-    "gadgetId": "GAD-LAPTOP-PRO",
-    "category": "Electronics",
-    "quantity": 1,
-    "price": 1499.50
-  },
-  {
-    "description": "Bulk Order - Cables",
-    "orderId": "ORD-003",
-    "customerId": "CUST-102",
-    "gadgetId": "GAD-CABLE-USB",
-    "category": "Accessories",
-    "quantity": 50,
-    "price": 5.00
-  },
-  {
-    "description": "Book - Fiction",
-    "orderId": "ORD-004",
-    "customerId": "CUST-103",
-    "gadgetId": "BK-SCIFI-01",
-    "category": "Books",
-    "quantity": 1,
-    "price": 19.99
-  },
-  {
-    "description": "Book - Technical",
-    "orderId": "ORD-005",
-    "customerId": "CUST-100",
-    "gadgetId": "BK-PYTHON-101",
-    "category": "Books",
-    "quantity": 1,
-    "price": 45.00
-  },
-  {
-    "description": "Home - Kitchen",
-    "orderId": "ORD-006",
-    "customerId": "CUST-104",
-    "gadgetId": "HM-BLENDER",
-    "category": "Home",
-    "quantity": 1,
-    "price": 89.90
-  },
-  {
-    "description": "High Value Order",
-    "orderId": "ORD-007",
-    "customerId": "CUST-105",
-    "gadgetId": "GAD-TV-8K",
-    "category": "Electronics",
-    "quantity": 1,
-    "price": 2500.00
-  },
-  {
-    "description": "Multiple Items - Low Price",
-    "orderId": "ORD-008",
-    "customerId": "CUST-106",
-    "gadgetId": "OFF-PEN-BLUE",
-    "category": "Office",
-    "quantity": 100,
-    "price": 1.50
-  },
-  {
-    "description": "Repeating Customer 100",
-    "orderId": "ORD-009",
-    "customerId": "CUST-100",
-    "gadgetId": "GAD-HEADPHONES",
-    "category": "Electronics",
-    "quantity": 2,
-    "price": 150.00
-  },
-  {
-    "description": "Repeating Customer 101",
-    "orderId": "ORD-010",
-    "customerId": "CUST-101",
-    "gadgetId": "GM-CONSOLE",
-    "category": "Gaming",
-    "quantity": 1,
-    "price": 499.00
-  },
-  {
-    "description": "Gaming Accessory",
-    "orderId": "ORD-011",
-    "customerId": "CUST-101",
-    "gadgetId": "GM-CONTROLLER",
-    "category": "Gaming",
-    "quantity": 2,
-    "price": 60.00
-  },
-  {
-    "description": "Garden Item",
-    "orderId": "ORD-012",
-    "customerId": "CUST-107",
-    "gadgetId": "GDN-HOSE",
-    "category": "Garden",
-    "quantity": 1,
-    "price": 25.50
-  },
-  {
-    "description": "Garden Tool",
-    "orderId": "ORD-013",
-    "customerId": "CUST-107",
-    "gadgetId": "GDN-SHOVEL",
-    "category": "Garden",
-    "quantity": 1,
-    "price": 15.00
-  },
-  {
-    "description": "Sports Equipment",
-    "orderId": "ORD-014",
-    "customerId": "CUST-108",
-    "gadgetId": "SPT-BALL-SOC",
-    "category": "Sports",
-    "quantity": 5,
-    "price": 20.00
-  },
-  {
-    "description": "Clothing - Shirt",
-    "orderId": "ORD-015",
-    "customerId": "CUST-109",
-    "gadgetId": "CLT-TSHIRT-BLK",
-    "category": "Clothing",
-    "quantity": 3,
-    "price": 12.00
-  },
-  {
-    "description": "Clothing - Jeans",
-    "orderId": "ORD-016",
-    "customerId": "CUST-109",
-    "gadgetId": "CLT-JEANS-BLU",
-    "category": "Clothing",
-    "quantity": 1,
-    "price": 45.00
-  },
-  {
-    "description": "Repeating Customer 100 - Office",
-    "orderId": "ORD-017",
-    "customerId": "CUST-100",
-    "gadgetId": "OFF-DESK-LAMP",
-    "category": "Office",
-    "quantity": 1,
-    "price": 30.00
-  },
-  {
-    "description": "Small decimal price",
-    "orderId": "ORD-018",
-    "customerId": "CUST-110",
-    "gadgetId": "HRD-SCREW-PACK",
-    "category": "Hardware",
-    "quantity": 10,
-    "price": 0.99
-  },
-  {
-    "description": "Exact round number",
-    "orderId": "ORD-019",
-    "customerId": "CUST-111",
-    "gadgetId": "GFT-CARD-50",
-    "category": "GiftCards",
-    "quantity": 4,
-    "price": 50.00
-  },
-  {
-    "description": "Automotive part",
-    "orderId": "ORD-020",
-    "customerId": "CUST-112",
-    "gadgetId": "AUTO-OIL-FILTER",
-    "category": "Automotive",
-    "quantity": 1,
-    "price": 12.50
-  },
-  {
-    "description": "Automotive accessory",
-    "orderId": "ORD-021",
-    "customerId": "CUST-112",
-    "gadgetId": "AUTO-WAX",
-    "category": "Automotive",
-    "quantity": 1,
-    "price": 18.00
-  },
-  {
-    "description": "Pet Food",
-    "orderId": "ORD-022",
-    "customerId": "CUST-113",
-    "gadgetId": "PET-DOG-FOOD",
-    "category": "Pets",
-    "quantity": 2,
-    "price": 35.00
-  },
-  {
-    "description": "Pet Toy",
-    "orderId": "ORD-023",
-    "customerId": "CUST-113",
-    "gadgetId": "PET-CAT-TOY",
-    "category": "Pets",
-    "quantity": 5,
-    "price": 4.50
-  },
-  {
-    "description": "Beauty Product",
-    "orderId": "ORD-024",
-    "customerId": "CUST-114",
-    "gadgetId": "BTY-SHAMPOO",
-    "category": "Beauty",
-    "quantity": 1,
-    "price": 8.00
-  },
-  {
-    "description": "Beauty - Expensive",
-    "orderId": "ORD-025",
-    "customerId": "CUST-114",
-    "gadgetId": "BTY-PERFUME",
-    "category": "Beauty",
-    "quantity": 1,
-    "price": 120.00
-  },
-  {
-    "description": "Music Instrument",
-    "orderId": "ORD-026",
-    "customerId": "CUST-115",
-    "gadgetId": "MUS-GUITAR-STR",
-    "category": "Music",
-    "quantity": 3,
-    "price": 15.00
-  },
-  {
-    "description": "High Quantity Low Price",
-    "orderId": "ORD-027",
-    "customerId": "CUST-116",
-    "gadgetId": "IND-WASHER",
-    "category": "Industrial",
-    "quantity": 1000,
-    "price": 0.05
-  },
-  {
-    "description": "Software License",
-    "orderId": "ORD-028",
-    "customerId": "CUST-117",
-    "gadgetId": "SW-ANTIVIRUS",
-    "category": "Software",
-    "quantity": 1,
-    "price": 29.99
-  },
-  {
-    "description": "Digital Service",
-    "orderId": "ORD-029",
-    "customerId": "CUST-117",
-    "gadgetId": "SW-CLOUD-STORAGE",
-    "category": "Software",
-    "quantity": 12,
-    "price": 9.99
-  },
-  {
-    "description": "Furniture - Chair",
-    "orderId": "ORD-030",
-    "customerId": "CUST-118",
-    "gadgetId": "HM-OFFICE-CHAIR",
-    "category": "Home",
-    "quantity": 4,
-    "price": 150.00
-  },
-  {
-    "description": "Furniture - Desk",
-    "orderId": "ORD-031",
-    "customerId": "CUST-118",
-    "gadgetId": "HM-STAND-DESK",
-    "category": "Home",
-    "quantity": 1,
-    "price": 300.00
-  },
-  {
-    "description": "Grocery - Non Perishable",
-    "orderId": "ORD-032",
-    "customerId": "CUST-119",
-    "gadgetId": "GRO-COFFEE",
-    "category": "Grocery",
-    "quantity": 6,
-    "price": 14.00
-  },
-  {
-    "description": "Grocery - Bulk",
-    "orderId": "ORD-033",
-    "customerId": "CUST-119",
-    "gadgetId": "GRO-RICE-20KG",
-    "category": "Grocery",
-    "quantity": 1,
-    "price": 28.00
-  },
-  {
-    "description": "Toy - Lego",
-    "orderId": "ORD-034",
-    "customerId": "CUST-120",
-    "gadgetId": "TOY-BRICKS-SET",
-    "category": "Toys",
-    "quantity": 1,
-    "price": 89.99
-  },
-  {
-    "description": "Toy - Action Figure",
-    "orderId": "ORD-035",
-    "customerId": "CUST-120",
-    "gadgetId": "TOY-HERO",
-    "category": "Toys",
-    "quantity": 2,
-    "price": 15.99
-  },
-  {
-    "description": "Large Order ID",
-    "orderId": "ORD-9999999999",
-    "customerId": "CUST-121",
-    "gadgetId": "GAD-TABLET",
-    "category": "Electronics",
-    "quantity": 1,
-    "price": 300.00
-  },
-  {
-    "description": "Customer with special chars",
-    "orderId": "ORD-037",
-    "customerId": "CUST-@_-122",
-    "gadgetId": "GAD-MOUSE",
-    "category": "Electronics",
-    "quantity": 1,
-    "price": 20.00
-  },
-  {
-    "description": "Very expensive industrial item",
-    "orderId": "ORD-038",
-    "customerId": "CUST-123",
-    "gadgetId": "IND-GENERATOR",
-    "category": "Industrial",
-    "quantity": 1,
-    "price": 5000.50
-  },
-  {
-    "description": "Category with spaces",
-    "orderId": "ORD-039",
-    "customerId": "CUST-124",
-    "gadgetId": "OUT-TENT",
-    "category": "Outdoor & Camping",
-    "quantity": 1,
-    "price": 120.00
-  },
-  {
-    "description": "Category Mixed Case",
-    "orderId": "ORD-040",
-    "customerId": "CUST-124",
-    "gadgetId": "OUT-SLEEPBAG",
-    "category": "outdoor & camping",
-    "quantity": 2,
-    "price": 45.00
-  },
-  {
-    "description": "Smart Home Device",
-    "orderId": "ORD-041",
-    "customerId": "CUST-100",
-    "gadgetId": "SMT-LIGHT",
-    "category": "SmartHome",
-    "quantity": 10,
-    "price": 12.99
-  },
-  {
-    "description": "Smart Home Hub",
-    "orderId": "ORD-042",
-    "customerId": "CUST-100",
-    "gadgetId": "SMT-HUB",
-    "category": "SmartHome",
-    "quantity": 1,
-    "price": 59.99
-  },
-  {
-    "description": "Camera",
-    "orderId": "ORD-043",
-    "customerId": "CUST-125",
-    "gadgetId": "CAM-DSLR",
-    "category": "Photography",
-    "quantity": 1,
-    "price": 850.00
-  },
-  {
-    "description": "Camera Lens",
-    "orderId": "ORD-044",
-    "customerId": "CUST-125",
-    "gadgetId": "CAM-LENS-50MM",
-    "category": "Photography",
-    "quantity": 1,
-    "price": 120.00
-  },
-  {
-    "description": "Baby Product",
-    "orderId": "ORD-045",
-    "customerId": "CUST-126",
-    "gadgetId": "BBY-DIAPERS",
-    "category": "Baby",
-    "quantity": 4,
-    "price": 22.00
-  },
-  {
-    "description": "Baby Monitor",
-    "orderId": "ORD-046",
-    "customerId": "CUST-126",
-    "gadgetId": "BBY-MONITOR",
-    "category": "Baby",
-    "quantity": 1,
-    "price": 75.00
-  },
-  {
-    "description": "Jewelry",
-    "orderId": "ORD-047",
-    "customerId": "CUST-127",
-    "gadgetId": "JWL-NECKLACE",
-    "category": "Jewelry",
-    "quantity": 1,
-    "price": 150.00
-  },
-  {
-    "description": "Watch",
-    "orderId": "ORD-048",
-    "customerId": "CUST-127",
-    "gadgetId": "JWL-WATCH",
-    "category": "Jewelry",
-    "quantity": 1,
-    "price": 200.00
-  },
-  {
-    "description": "Final Aggregation Test A",
-    "orderId": "ORD-049",
-    "customerId": "CUST-TEST-AGG",
-    "gadgetId": "TEST-ITEM-1",
-    "category": "TestCategory",
-    "quantity": 100,
-    "price": 10.00
-  },
-  {
-    "description": "Final Aggregation Test B",
-    "orderId": "ORD-050",
-    "customerId": "CUST-TEST-AGG",
-    "gadgetId": "TEST-ITEM-1",
-    "category": "TestCategory",
-    "quantity": 50,
-    "price": 10.00
-  }
-]
+{
+  "Records": [
+    {
+      "description": "Standard Order 1 - Electronics",
+      "orderId": "ORD-001",
+      "customerId": "CUST-100",
+      "gadgetId": "GAD-PHONE-X",
+      "category": "Electronics",
+      "quantity": 1,
+      "price": 1000
+    },
+    {
+      "description": "Standard Order 2 - Electronics",
+      "orderId": "ORD-002",
+      "customerId": "CUST-101",
+      "gadgetId": "GAD-LAPTOP-PRO",
+      "category": "Electronics",
+      "quantity": 1,
+      "price": 1500
+    },
+    {
+      "description": "Bulk Order - Cables",
+      "orderId": "ORD-003",
+      "customerId": "CUST-102",
+      "gadgetId": "GAD-CABLE-USB",
+      "category": "Accessories",
+      "quantity": 50,
+      "price": 5
+    },
+    {
+      "description": "Book - Fiction",
+      "orderId": "ORD-004",
+      "customerId": "CUST-103",
+      "gadgetId": "BK-SCIFI-01",
+      "category": "Books",
+      "quantity": 1,
+      "price": 20
+    },
+    {
+      "description": "Book - Technical",
+      "orderId": "ORD-005",
+      "customerId": "CUST-100",
+      "gadgetId": "BK-PYTHON-101",
+      "category": "Books",
+      "quantity": 1,
+      "price": 45
+    },
+    {
+      "description": "Home - Kitchen",
+      "orderId": "ORD-006",
+      "customerId": "CUST-104",
+      "gadgetId": "HM-BLENDER",
+      "category": "Home",
+      "quantity": 1,
+      "price": 90
+    },
+    {
+      "description": "High Value Order",
+      "orderId": "ORD-007",
+      "customerId": "CUST-105",
+      "gadgetId": "GAD-TV-8K",
+      "category": "Electronics",
+      "quantity": 1,
+      "price": 2500
+    },
+    {
+      "description": "Multiple Items - Low Price",
+      "orderId": "ORD-008",
+      "customerId": "CUST-106",
+      "gadgetId": "OFF-PEN-BLUE",
+      "category": "Office",
+      "quantity": 100,
+      "price": 2
+    },
+    {
+      "description": "Repeating Customer 100",
+      "orderId": "ORD-009",
+      "customerId": "CUST-100",
+      "gadgetId": "GAD-HEADPHONES",
+      "category": "Electronics",
+      "quantity": 2,
+      "price": 150
+    },
+    {
+      "description": "Repeating Customer 101",
+      "orderId": "ORD-010",
+      "customerId": "CUST-101",
+      "gadgetId": "GM-CONSOLE",
+      "category": "Gaming",
+      "quantity": 1,
+      "price": 499
+    },
+    {
+      "description": "Gaming Accessory",
+      "orderId": "ORD-011",
+      "customerId": "CUST-101",
+      "gadgetId": "GM-CONTROLLER",
+      "category": "Gaming",
+      "quantity": 2,
+      "price": 60
+    },
+    {
+      "description": "Garden Item",
+      "orderId": "ORD-012",
+      "customerId": "CUST-107",
+      "gadgetId": "GDN-HOSE",
+      "category": "Garden",
+      "quantity": 1,
+      "price": 26
+    },
+    {
+      "description": "Garden Tool",
+      "orderId": "ORD-013",
+      "customerId": "CUST-107",
+      "gadgetId": "GDN-SHOVEL",
+      "category": "Garden",
+      "quantity": 1,
+      "price": 15
+    },
+    {
+      "description": "Sports Equipment",
+      "orderId": "ORD-014",
+      "customerId": "CUST-108",
+      "gadgetId": "SPT-BALL-SOC",
+      "category": "Sports",
+      "quantity": 5,
+      "price": 20
+    },
+    {
+      "description": "Clothing - Shirt",
+      "orderId": "ORD-015",
+      "customerId": "CUST-109",
+      "gadgetId": "CLT-TSHIRT-BLK",
+      "category": "Clothing",
+      "quantity": 3,
+      "price": 12
+    },
+    {
+      "description": "Clothing - Jeans",
+      "orderId": "ORD-016",
+      "customerId": "CUST-109",
+      "gadgetId": "CLT-JEANS-BLU",
+      "category": "Clothing",
+      "quantity": 1,
+      "price": 45
+    },
+    {
+      "description": "Repeating Customer 100 - Office",
+      "orderId": "ORD-017",
+      "customerId": "CUST-100",
+      "gadgetId": "OFF-DESK-LAMP",
+      "category": "Office",
+      "quantity": 1,
+      "price": 30
+    },
+    {
+      "description": "Small decimal price",
+      "orderId": "ORD-018",
+      "customerId": "CUST-110",
+      "gadgetId": "HRD-SCREW-PACK",
+      "category": "Hardware",
+      "quantity": 10,
+      "price": 1
+    },
+    {
+      "description": "Exact round number",
+      "orderId": "ORD-019",
+      "customerId": "CUST-111",
+      "gadgetId": "GFT-CARD-50",
+      "category": "GiftCards",
+      "quantity": 4,
+      "price": 50
+    },
+    {
+      "description": "Automotive part",
+      "orderId": "ORD-020",
+      "customerId": "CUST-112",
+      "gadgetId": "AUTO-OIL-FILTER",
+      "category": "Automotive",
+      "quantity": 1,
+      "price": 13
+    },
+    {
+      "description": "Automotive accessory",
+      "orderId": "ORD-021",
+      "customerId": "CUST-112",
+      "gadgetId": "AUTO-WAX",
+      "category": "Automotive",
+      "quantity": 1,
+      "price": 18
+    },
+    {
+      "description": "Pet Food",
+      "orderId": "ORD-022",
+      "customerId": "CUST-113",
+      "gadgetId": "PET-DOG-FOOD",
+      "category": "Pets",
+      "quantity": 2,
+      "price": 35
+    },
+    {
+      "description": "Pet Toy",
+      "orderId": "ORD-023",
+      "customerId": "CUST-113",
+      "gadgetId": "PET-CAT-TOY",
+      "category": "Pets",
+      "quantity": 5,
+      "price": 5
+    },
+    {
+      "description": "Beauty Product",
+      "orderId": "ORD-024",
+      "customerId": "CUST-114",
+      "gadgetId": "BTY-SHAMPOO",
+      "category": "Beauty",
+      "quantity": 1,
+      "price": 8
+    },
+    {
+      "description": "Beauty - Expensive",
+      "orderId": "ORD-025",
+      "customerId": "CUST-114",
+      "gadgetId": "BTY-PERFUME",
+      "category": "Beauty",
+      "quantity": 1,
+      "price": 120
+    },
+    {
+      "description": "Music Instrument",
+      "orderId": "ORD-026",
+      "customerId": "CUST-115",
+      "gadgetId": "MUS-GUITAR-STR",
+      "category": "Music",
+      "quantity": 3,
+      "price": 15
+    },
+    {
+      "description": "High Quantity Low Price",
+      "orderId": "ORD-027",
+      "customerId": "CUST-116",
+      "gadgetId": "IND-WASHER",
+      "category": "Industrial",
+      "quantity": 1000,
+      "price": 1
+    },
+    {
+      "description": "Software License",
+      "orderId": "ORD-028",
+      "customerId": "CUST-117",
+      "gadgetId": "SW-ANTIVIRUS",
+      "category": "Software",
+      "quantity": 1,
+      "price": 30
+    },
+    {
+      "description": "Digital Service",
+      "orderId": "ORD-029",
+      "customerId": "CUST-117",
+      "gadgetId": "SW-CLOUD-STORAGE",
+      "category": "Software",
+      "quantity": 12,
+      "price": 10
+    },
+    {
+      "description": "Furniture - Chair",
+      "orderId": "ORD-030",
+      "customerId": "CUST-118",
+      "gadgetId": "HM-OFFICE-CHAIR",
+      "category": "Home",
+      "quantity": 4,
+      "price": 150
+    },
+    {
+      "description": "Furniture - Desk",
+      "orderId": "ORD-031",
+      "customerId": "CUST-118",
+      "gadgetId": "HM-STAND-DESK",
+      "category": "Home",
+      "quantity": 1,
+      "price": 300
+    },
+    {
+      "description": "Grocery - Non Perishable",
+      "orderId": "ORD-032",
+      "customerId": "CUST-119",
+      "gadgetId": "GRO-COFFEE",
+      "category": "Grocery",
+      "quantity": 6,
+      "price": 14
+    },
+    {
+      "description": "Grocery - Bulk",
+      "orderId": "ORD-033",
+      "customerId": "CUST-119",
+      "gadgetId": "GRO-RICE-20KG",
+      "category": "Grocery",
+      "quantity": 1,
+      "price": 28
+    },
+    {
+      "description": "Toy - Lego",
+      "orderId": "ORD-034",
+      "customerId": "CUST-120",
+      "gadgetId": "TOY-BRICKS-SET",
+      "category": "Toys",
+      "quantity": 1,
+      "price": 90
+    },
+    {
+      "description": "Toy - Action Figure",
+      "orderId": "ORD-035",
+      "customerId": "CUST-120",
+      "gadgetId": "TOY-HERO",
+      "category": "Toys",
+      "quantity": 2,
+      "price": 16
+    },
+    {
+      "description": "Large Order ID",
+      "orderId": "ORD-9999999999",
+      "customerId": "CUST-121",
+      "gadgetId": "GAD-TABLET",
+      "category": "Electronics",
+      "quantity": 1,
+      "price": 300
+    },
+    {
+      "description": "Customer with special chars",
+      "orderId": "ORD-037",
+      "customerId": "CUST-@_-122",
+      "gadgetId": "GAD-MOUSE",
+      "category": "Electronics",
+      "quantity": 1,
+      "price": 20
+    },
+    {
+      "description": "Very expensive industrial item",
+      "orderId": "ORD-038",
+      "customerId": "CUST-123",
+      "gadgetId": "IND-GENERATOR",
+      "category": "Industrial",
+      "quantity": 1,
+      "price": 5000
+    },
+    {
+      "description": "Category with spaces",
+      "orderId": "ORD-039",
+      "customerId": "CUST-124",
+      "gadgetId": "OUT-TENT",
+      "category": "Outdoor & Camping",
+      "quantity": 1,
+      "price": 120
+    },
+    {
+      "description": "Category Mixed Case",
+      "orderId": "ORD-040",
+      "customerId": "CUST-124",
+      "gadgetId": "OUT-SLEEPBAG",
+      "category": "outdoor & camping",
+      "quantity": 2,
+      "price": 45
+    },
+    {
+      "description": "Smart Home Device",
+      "orderId": "ORD-041",
+      "customerId": "CUST-100",
+      "gadgetId": "SMT-LIGHT",
+      "category": "SmartHome",
+      "quantity": 10,
+      "price": 13
+    },
+    {
+      "description": "Smart Home Hub",
+      "orderId": "ORD-042",
+      "customerId": "CUST-100",
+      "gadgetId": "SMT-HUB",
+      "category": "SmartHome",
+      "quantity": 1,
+      "price": 60
+    },
+    {
+      "description": "Camera",
+      "orderId": "ORD-043",
+      "customerId": "CUST-125",
+      "gadgetId": "CAM-DSLR",
+      "category": "Photography",
+      "quantity": 1,
+      "price": 850
+    },
+    {
+      "description": "Camera Lens",
+      "orderId": "ORD-044",
+      "customerId": "CUST-125",
+      "gadgetId": "CAM-LENS-50MM",
+      "category": "Photography",
+      "quantity": 1,
+      "price": 120
+    },
+    {
+      "description": "Baby Product",
+      "orderId": "ORD-045",
+      "customerId": "CUST-126",
+      "gadgetId": "BBY-DIAPERS",
+      "category": "Baby",
+      "quantity": 4,
+      "price": 22
+    },
+    {
+      "description": "Baby Monitor",
+      "orderId": "ORD-046",
+      "customerId": "CUST-126",
+      "gadgetId": "BBY-MONITOR",
+      "category": "Baby",
+      "quantity": 1,
+      "price": 75
+    },
+    {
+      "description": "Jewelry",
+      "orderId": "ORD-047",
+      "customerId": "CUST-127",
+      "gadgetId": "JWL-NECKLACE",
+      "category": "Jewelry",
+      "quantity": 1,
+      "price": 150
+    },
+    {
+      "description": "Watch",
+      "orderId": "ORD-048",
+      "customerId": "CUST-127",
+      "gadgetId": "JWL-WATCH",
+      "category": "Jewelry",
+      "quantity": 1,
+      "price": 200
+    },
+    {
+      "description": "Final Aggregation Test A",
+      "orderId": "ORD-049",
+      "customerId": "CUST-TEST-AGG",
+      "gadgetId": "TEST-ITEM-1",
+      "category": "TestCategory",
+      "quantity": 100,
+      "price": 10
+    },
+    {
+      "description": "Final Aggregation Test B",
+      "orderId": "ORD-050",
+      "customerId": "CUST-TEST-AGG",
+      "gadgetId": "TEST-ITEM-1",
+      "category": "TestCategory",
+      "quantity": 50,
+      "price": 10
+    }
+  ]
+}
