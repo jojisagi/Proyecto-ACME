@@ -1,0 +1,600 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Serverless Purchase Order Aggregation System'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+  
+  GitHubRepo:
+    Type: String
+    Description: GitHub repository name
+  
+  GitHubBranch:
+    Type: String
+    Default: main
+  
+  IAMRolesStackName:
+    Type: String
+    Description: Name of the IAM roles CloudFormation stack
+    Default: purchase-orders-iam-roles
+
+Resources:
+  # KMS Key for encryption
+  DataEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Encryption key for purchase order data
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable IAM policies
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow Lambda to use key
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:Encrypt'
+              - 'kms:GenerateDataKey'
+            Resource: '*'
+
+  DataEncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/purchase-orders-${Environment}'
+      TargetKeyId: !Ref DataEncryptionKey
+
+  # VPC Configuration
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub 'purchase-orders-vpc-${Environment}'
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub 'private-subnet-1-${Environment}'
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub 'private-subnet-2-${Environment}'
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda functions
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  # VPC Endpoints
+  DynamoDBVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.dynamodb'
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+      VpcEndpointType: Gateway
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # DynamoDB Tables
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'purchase-orders-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: !Ref DataEncryptionKey
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+        - AttributeName: customerId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: CustomerIndex
+          KeySchema:
+            - AttributeName: customerId
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  AggregationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'order-aggregations-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: !Ref DataEncryptionKey
+      AttributeDefinitions:
+        - AttributeName: aggregationKey
+          AttributeType: S
+        - AttributeName: period
+          AttributeType: S
+      KeySchema:
+        - AttributeName: aggregationKey
+          KeyType: HASH
+        - AttributeName: period
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub 'purchase-orders-users-${Environment}'
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub 'api-client-${Environment}'
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  # EventBridge
+  OrderEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub 'purchase-orders-${Environment}'
+
+  # Lambda Functions
+  OrderProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'order-processor-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role:
+        Fn::ImportValue: !Sub '${IAMRolesStackName}-LambdaExecutionRoleArn'
+      Timeout: 30
+      MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+          ENVIRONMENT: !Ref Environment
+      Code:
+        ZipFile: |
+          import json
+          import os
+          import boto3
+          from datetime import datetime
+          
+          dynamodb = boto3.resource('dynamodb')
+          table = dynamodb.Table(os.environ['ORDERS_TABLE'])
+          
+          def handler(event, context):
+              print(f"Processing event: {json.dumps(event)}")
+              
+              for record in event.get('Records', []):
+                  if 'eventbridge' in record:
+                      detail = record['detail']
+                  else:
+                      detail = json.loads(record['body']) if 'body' in record else record
+                  
+                  order_id = detail['orderId']
+                  timestamp = int(datetime.now().timestamp() * 1000)
+                  
+                  item = {
+                      'orderId': order_id,
+                      'timestamp': timestamp,
+                      'customerId': detail['customerId'],
+                      'gadgetId': detail['gadgetId'],
+                      'category': detail['category'],
+                      'quantity': detail['quantity'],
+                      'price': detail['price'],
+                      'totalAmount': detail['quantity'] * detail['price']
+                  }
+                  
+                  table.put_item(Item=item)
+                  print(f"Stored order: {order_id}")
+              
+              return {'statusCode': 200, 'body': 'Orders processed'}
+
+  AggregatorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'order-aggregator-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role:
+        Fn::ImportValue: !Sub '${IAMRolesStackName}-LambdaExecutionRoleArn'
+      Timeout: 60
+      MemorySize: 1024
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          AGGREGATIONS_TABLE: !Ref AggregationsTable
+          ENVIRONMENT: !Ref Environment
+      Code:
+        ZipFile: |
+          import json
+          import os
+          import boto3
+          from datetime import datetime
+          from decimal import Decimal
+          
+          dynamodb = boto3.resource('dynamodb')
+          table = dynamodb.Table(os.environ['AGGREGATIONS_TABLE'])
+          
+          def handler(event, context):
+              print(f"Aggregating from stream: {len(event['Records'])} records")
+              
+              for record in event['Records']:
+                  if record['eventName'] != 'INSERT':
+                      continue
+                  
+                  new_image = record['dynamodb']['NewImage']
+                  order_data = {
+                      'customerId': new_image['customerId']['S'],
+                      'gadgetId': new_image['gadgetId']['S'],
+                      'category': new_image['category']['S'],
+                      'quantity': int(new_image['quantity']['N']),
+                      'totalAmount': Decimal(new_image['totalAmount']['N'])
+                  }
+                  
+                  timestamp = int(new_image['timestamp']['N'])
+                  dt = datetime.fromtimestamp(timestamp / 1000)
+                  
+                  periods = {
+                      'daily': dt.strftime('%Y-%m-%d'),
+                      'weekly': dt.strftime('%Y-W%U'),
+                      'monthly': dt.strftime('%Y-%m')
+                  }
+                  
+                  # Aggregate by gadget
+                  for period_type, period_value in periods.items():
+                      update_aggregation(
+                          f"gadget#{order_data['gadgetId']}",
+                          f"{period_type}#{period_value}",
+                          order_data['quantity'],
+                          order_data['totalAmount']
+                      )
+                      
+                      # Aggregate by category
+                      update_aggregation(
+                          f"category#{order_data['category']}",
+                          f"{period_type}#{period_value}",
+                          order_data['quantity'],
+                          order_data['totalAmount']
+                      )
+                      
+                      # Aggregate by customer
+                      update_aggregation(
+                          f"customer#{order_data['customerId']}",
+                          f"{period_type}#{period_value}",
+                          order_data['quantity'],
+                          order_data['totalAmount']
+                      )
+              
+              return {'statusCode': 200}
+          
+          def update_aggregation(agg_key, period, quantity, amount):
+              table.update_item(
+                  Key={'aggregationKey': agg_key, 'period': period},
+                  UpdateExpression='ADD orderCount :one, totalQuantity :qty, totalRevenue :amt',
+                  ExpressionAttributeValues={
+                      ':one': 1,
+                      ':qty': quantity,
+                      ':amt': amount
+                  }
+              )
+
+  StreamEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt OrdersTable.StreamArn
+      FunctionName: !Ref AggregatorFunction
+      StartingPosition: LATEST
+      BatchSize: 100
+      MaximumBatchingWindowInSeconds: 5
+
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'order-api-${Environment}'
+      Runtime: python3.11
+      Handler: index.handler
+      Role:
+        Fn::ImportValue: !Sub '${IAMRolesStackName}-LambdaExecutionRoleArn'
+      Timeout: 30
+      MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+          AGGREGATIONS_TABLE: !Ref AggregationsTable
+          ENVIRONMENT: !Ref Environment
+      Code:
+        ZipFile: |
+          import json
+          import os
+          import boto3
+          from decimal import Decimal
+          
+          dynamodb = boto3.resource('dynamodb')
+          orders_table = dynamodb.Table(os.environ['ORDERS_TABLE'])
+          agg_table = dynamodb.Table(os.environ['AGGREGATIONS_TABLE'])
+          
+          class DecimalEncoder(json.JSONEncoder):
+              def default(self, obj):
+                  if isinstance(obj, Decimal):
+                      return float(obj)
+                  return super(DecimalEncoder, self).default(obj)
+          
+          def handler(event, context):
+              path = event.get('path', '')
+              method = event.get('httpMethod', '')
+              
+              if path == '/orders' and method == 'GET':
+                  return get_orders(event)
+              elif path == '/aggregations' and method == 'GET':
+                  return get_aggregations(event)
+              
+              return {'statusCode': 404, 'body': json.dumps({'error': 'Not found'})}
+          
+          def get_orders(event):
+              params = event.get('queryStringParameters', {}) or {}
+              customer_id = params.get('customerId')
+              
+              if customer_id:
+                  response = orders_table.query(
+                      IndexName='CustomerIndex',
+                      KeyConditionExpression='customerId = :cid',
+                      ExpressionAttributeValues={':cid': customer_id},
+                      Limit=100
+                  )
+              else:
+                  response = orders_table.scan(Limit=100)
+              
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps(response['Items'], cls=DecimalEncoder)
+              }
+          
+          def get_aggregations(event):
+              params = event.get('queryStringParameters', {}) or {}
+              agg_type = params.get('type', 'gadget')
+              agg_id = params.get('id', '')
+              period_type = params.get('period', 'daily')
+              
+              agg_key = f"{agg_type}#{agg_id}" if agg_id else f"{agg_type}#"
+              
+              response = agg_table.query(
+                  KeyConditionExpression='aggregationKey = :key AND begins_with(period, :period)',
+                  ExpressionAttributeValues={
+                      ':key': agg_key,
+                      ':period': period_type
+                  },
+                  Limit=100
+              )
+              
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps(response['Items'], cls=DecimalEncoder)
+              }
+
+  # API Gateway
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub 'purchase-orders-api-${Environment}'
+      Description: Purchase Order Aggregation API
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  ApiAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref RestApi
+      ProviderARNs:
+        - !GetAtt UserPool.Arn
+
+  OrdersResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: orders
+
+  OrdersMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref OrdersResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations'
+
+  AggregationsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: aggregations
+
+  AggregationsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref AggregationsResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations'
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - OrdersMethod
+      - AggregationsMethod
+    Properties:
+      RestApiId: !Ref RestApi
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref RestApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: !Ref Environment
+
+  ApiLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*'
+
+  # EventBridge Rule
+  OrderEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref OrderEventBus
+      EventPattern:
+        source:
+          - ecommerce.system
+        detail-type:
+          - OrderPlaced
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt OrderProcessorFunction.Arn
+          Id: OrderProcessorTarget
+
+  EventBridgeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OrderProcessorFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt OrderEventRule.Arn
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiEndpoint'
+
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref UserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolId'
+
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref UserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolClientId'
+
+  EventBusName:
+    Description: EventBridge Event Bus Name
+    Value: !Ref OrderEventBus
+    Export:
+      Name: !Sub '${AWS::StackName}-EventBusName'
+
+  OrdersTableName:
+    Description: Orders DynamoDB Table Name
+    Value: !Ref OrdersTable
+
+  AggregationsTableName:
+    Description: Aggregations DynamoDB Table Name
+    Value: !Ref AggregationsTable
