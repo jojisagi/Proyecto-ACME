@@ -1,0 +1,320 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Infraestructura para sistema de procesamiento de toons con Lambda'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Ambiente de despliegue
+
+Resources:
+  # ==================== DynamoDB Tables ====================
+  
+  ToonJobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'ToonJobs-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: jobId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jobId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  ToonResultsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'ToonResults-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: jobId
+          AttributeType: S
+        - AttributeName: toonId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jobId
+          KeyType: HASH
+        - AttributeName: toonId
+          KeyType: RANGE
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ==================== SQS Queue ====================
+  
+  ToonProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub 'ToonProcessingQueue-${Environment}'
+      VisibilityTimeout: 300
+      MessageRetentionPeriod: 1209600
+      ReceiveMessageWaitTimeSeconds: 20
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ToonDLQ.Arn
+        maxReceiveCount: 3
+
+  ToonDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub 'ToonDLQ-${Environment}'
+      MessageRetentionPeriod: 1209600
+
+  # ==================== IAM Roles ====================
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'ToonProcessorLambdaRole-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource:
+                  - !GetAtt ToonJobsTable.Arn
+                  - !GetAtt ToonResultsTable.Arn
+        - PolicyName: SQSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource:
+                  - !GetAtt ToonProcessingQueue.Arn
+
+  # ==================== Lambda Functions ====================
+  
+  SubmitJobFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'SubmitJob-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          JOBS_TABLE_NAME: !Ref ToonJobsTable
+          TOON_QUEUE_URL: !Ref ToonProcessingQueue
+          JWT_SECRET: '{{resolve:secretsmanager:ToonProcessor/JWT:SecretString:secret}}'
+      Code:
+        ZipFile: |
+          # Placeholder - deploy con código real desde src/lambdas/submit_job/
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Deploy real code'}
+
+  WorkerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'ToonWorker-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 300
+      MemorySize: 1024
+      Environment:
+        Variables:
+          JOBS_TABLE_NAME: !Ref ToonJobsTable
+          RESULTS_TABLE_NAME: !Ref ToonResultsTable
+      Code:
+        ZipFile: |
+          # Placeholder - deploy con código real desde src/lambdas/worker/
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Deploy real code'}
+
+  GetJobStatusFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'GetJobStatus-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          JOBS_TABLE_NAME: !Ref ToonJobsTable
+      Code:
+        ZipFile: |
+          # Placeholder - deploy con código real desde src/lambdas/get_job_status/
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Deploy real code'}
+
+  GetResultsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'GetResults-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          JOBS_TABLE_NAME: !Ref ToonJobsTable
+          RESULTS_TABLE_NAME: !Ref ToonResultsTable
+      Code:
+        ZipFile: |
+          # Placeholder - deploy con código real desde src/lambdas/get_results/
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Deploy real code'}
+
+  # ==================== SQS Event Source Mapping ====================
+  
+  WorkerEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt ToonProcessingQueue.Arn
+      FunctionName: !Ref WorkerFunction
+      BatchSize: 1
+      Enabled: true
+
+  # ==================== API Gateway ====================
+  
+  ToonProcessorAPI:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub 'ToonProcessorAPI-${Environment}'
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+        AllowHeaders:
+          - '*'
+
+  ApiIntegrationSubmitJob:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt SubmitJobFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  ApiIntegrationGetJobStatus:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt GetJobStatusFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  ApiIntegrationGetResults:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt GetResultsFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  RouteSubmitJob:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      RouteKey: 'POST /submit-job'
+      Target: !Sub 'integrations/${ApiIntegrationSubmitJob}'
+
+  RouteGetJobStatus:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      RouteKey: 'GET /jobs/{jobId}'
+      Target: !Sub 'integrations/${ApiIntegrationGetJobStatus}'
+
+  RouteGetResults:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      RouteKey: 'GET /results'
+      Target: !Sub 'integrations/${ApiIntegrationGetResults}'
+
+  ApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ToonProcessorAPI
+      StageName: !Ref Environment
+      AutoDeploy: true
+
+  # ==================== Lambda Permissions ====================
+  
+  SubmitJobInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SubmitJobFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ToonProcessorAPI}/*'
+
+  GetJobStatusInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GetJobStatusFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ToonProcessorAPI}/*'
+
+  GetResultsInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GetResultsFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ToonProcessorAPI}/*'
+
+Outputs:
+  ApiEndpoint:
+    Description: URL del API Gateway
+    Value: !Sub 'https://${ToonProcessorAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiEndpoint'
+
+  ToonQueueUrl:
+    Description: URL de la cola SQS
+    Value: !Ref ToonProcessingQueue
+    Export:
+      Name: !Sub '${AWS::StackName}-QueueUrl'
+
+  JobsTableName:
+    Description: Nombre de la tabla de Jobs
+    Value: !Ref ToonJobsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-JobsTable'
+
+  ResultsTableName:
+    Description: Nombre de la tabla de Results
+    Value: !Ref ToonResultsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-ResultsTable'
