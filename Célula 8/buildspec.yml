@@ -1,0 +1,36 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing dependencies..."
+      - pip install --upgrade pip
+      - pip install boto3 pytest pytest-cov moto
+
+  pre_build:
+    commands:
+      - echo "Running tests..."
+      - cd tests && pytest -v --cov=../src || true
+      - cd ..
+
+  build:
+    commands:
+      - echo "Packaging Lambda functions..."
+      - cd src/handlers
+      - zip -r ../../order-processor.zip order_processor.py ../lib/
+      - zip -r ../../order-aggregator.zip order_aggregator.py ../lib/
+      - zip -r ../../order-api.zip order_api.py ../lib/
+      - cd ../..
+      
+      - echo "Packaging CloudFormation template..."
+      - aws cloudformation package
+        --template-file infrastructure/main.yaml
+        --s3-bucket $ARTIFACT_BUCKET
+        --output-template-file packaged-template.yaml
+
+artifacts:
+  files:
+    - packaged-template.yaml
+    - '*.zip'
