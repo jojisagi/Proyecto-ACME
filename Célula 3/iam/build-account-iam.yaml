@@ -52,8 +52,7 @@ Resources:
                   - codebuild:BatchGetBuilds
                   - codebuild:StartBuild
                   - codebuild:StopBuild
-                Resource:
-                  - !Sub 'arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${ProjectName}-*'
+                Resource: '*'
               
               # CloudFormation Access
               - Effect: Allow
@@ -76,23 +75,19 @@ Resources:
               - Effect: Allow
                 Action:
                   - iam:PassRole
-                Resource:
-                  - !GetAtt CloudFormationServiceRole.Arn
+                Resource: '*'
               
               # Cross-Account Assume Role
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource:
-                  - !Sub 'arn:aws:iam::${SandboxAccountId}:role/${ProjectName}-cross-account-role'
-                  - !Sub 'arn:aws:iam::${ProdAccountId}:role/${ProjectName}-cross-account-role'
+                Resource: '*'
               
               # CodePipeline específico
               - Effect: Allow
                 Action:
                   - codepipeline:*
-                Resource:
-                  - !Sub 'arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${ProjectName}-*'
+                Resource: '*'
       Tags:
         - Key: Project
           Value: !Ref ProjectName
@@ -123,9 +118,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-*'
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-*:*'
+                Resource: '*'
               
               # S3 Access para artefactos
               - Effect: Allow
@@ -161,8 +154,7 @@ Resources:
                   - codebuild:UpdateReport
                   - codebuild:BatchPutTestCases
                   - codebuild:BatchPutCodeCoverages
-                Resource:
-                  - !Sub 'arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/${ProjectName}-*'
+                Resource: '*'
       Tags:
         - Key: Project
           Value: !Ref ProjectName
