@@ -1,0 +1,237 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM Roles for Purchase Order Aggregation System'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name for resource naming
+
+Resources:
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'purchase-orders-lambda-role-${Environment}'
+      Description: Execution role for Lambda functions in purchase order system
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: purchase-orders
+
+  # DynamoDB Access Policy for Lambda
+  LambdaDynamoDBPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub 'lambda-dynamodb-policy-${Environment}'
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DynamoDBTableAccess
+            Effect: Allow
+            Action:
+              - 'dynamodb:PutItem'
+              - 'dynamodb:GetItem'
+              - 'dynamodb:UpdateItem'
+              - 'dynamodb:Query'
+              - 'dynamodb:Scan'
+            Resource: "*"
+          - Sid: DynamoDBStreamAccess
+            Effect: Allow
+            Action:
+              - 'dynamodb:DescribeStream'
+              - 'dynamodb:GetRecords'
+              - 'dynamodb:GetShardIterator'
+              - 'dynamodb:ListStreams'
+            Resource: "*"
+
+  # KMS Access Policy for Lambda
+  LambdaKMSPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub 'lambda-kms-policy-${Environment}'
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: KMSKeyAccess
+            Effect: Allow
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:Encrypt'
+              - 'kms:GenerateDataKey'
+            Resource: "*"
+
+  # CloudWatch Logs Policy for Lambda
+  LambdaCloudWatchLogsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub 'lambda-cloudwatch-logs-policy-${Environment}'
+      Roles:
+        - !Ref LambdaExecutionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: CloudWatchLogsAccess
+            Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource: '*'
+
+  # CodeBuild Role
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'purchase-orders-codebuild-role-${Environment}'
+      Description: Service role for CodeBuild in purchase order system
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/PowerUserAccess'
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: purchase-orders
+
+  # CloudFormation Access Policy for CodeBuild
+  CodeBuildCloudFormationPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub 'codebuild-cloudformation-policy-${Environment}'
+      Roles:
+        - !Ref CodeBuildRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: IAMFullAccess
+            Effect: Allow
+            Action:
+              - 'iam:*'
+            Resource: '*'
+          - Sid: CloudFormationFullAccess
+            Effect: Allow
+            Action:
+              - 'cloudformation:*'
+            Resource: '*'
+
+  # CodePipeline Role
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'purchase-orders-codepipeline-role-${Environment}'
+      Description: Service role for CodePipeline in purchase order system
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: purchase-orders
+
+  # Pipeline Policy for CodePipeline
+  CodePipelinePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub 'codepipeline-policy-${Environment}'
+      Roles:
+        - !Ref CodePipelineRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: S3Access
+            Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:GetObjectVersion'
+              - 's3:PutObject'
+              - 's3:GetBucketLocation'
+              - 's3:ListBucket'
+            Resource: "*"
+          - Sid: CodeBuildAccess
+            Effect: Allow
+            Action:
+              - 'codebuild:BatchGetBuilds'
+              - 'codebuild:StartBuild'
+            Resource: "*"
+          - Sid: CloudFormationAccess
+            Effect: Allow
+            Action:
+              - 'cloudformation:CreateStack'
+              - 'cloudformation:DescribeStacks'
+              - 'cloudformation:DeleteStack'
+              - 'cloudformation:UpdateStack'
+              - 'cloudformation:CreateChangeSet'
+              - 'cloudformation:ExecuteChangeSet'
+              - 'cloudformation:DeleteChangeSet'
+              - 'cloudformation:DescribeChangeSet'
+              - 'cloudformation:SetStackPolicy'
+            Resource: "*"
+          - Sid: IAMPassRole
+            Effect: Allow
+            Action:
+              - 'iam:PassRole'
+            Resource: "*"
+
+Outputs:
+  LambdaExecutionRoleArn:
+    Description: ARN of Lambda Execution Role
+    Value: !GetAtt LambdaExecutionRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaExecutionRoleArn'
+
+  LambdaExecutionRoleName:
+    Description: Name of Lambda Execution Role
+    Value: !Ref LambdaExecutionRole
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaExecutionRoleName'
+
+  CodeBuildRoleArn:
+    Description: ARN of CodeBuild Role
+    Value: !GetAtt CodeBuildRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CodeBuildRoleArn'
+
+  CodeBuildRoleName:
+    Description: Name of CodeBuild Role
+    Value: !Ref CodeBuildRole
+    Export:
+      Name: !Sub '${AWS::StackName}-CodeBuildRoleName'
+
+  CodePipelineRoleArn:
+    Description: ARN of CodePipeline Role
+    Value: !GetAtt CodePipelineRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CodePipelineRoleArn'
+
+  CodePipelineRoleName:
+    Description: Name of CodePipeline Role
+    Value: !Ref CodePipelineRole
+    Export:
+      Name: !Sub '${AWS::StackName}-CodePipelineRoleName'

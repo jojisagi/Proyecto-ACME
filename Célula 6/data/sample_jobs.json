@@ -1,0 +1,106 @@
+{
+  "examples": [
+    {
+      "description": "Job simple con 3 toons de tipo IMAGE",
+      "request": {
+        "jobId": "JOB-001",
+        "toons": [
+          {
+            "toonId": "TOON-001",
+            "type": "IMAGE",
+            "payload": {
+              "url": "https://example.com/image1.jpg",
+              "width": 1920,
+              "height": 1080,
+              "format": "jpeg"
+            }
+          },
+          {
+            "toonId": "TOON-002",
+            "type": "IMAGE",
+            "payload": {
+              "url": "https://example.com/image2.png",
+              "width": 800,
+              "height": 600,
+              "format": "png"
+            }
+          },
+          {
+            "toonId": "TOON-003",
+            "type": "IMAGE",
+            "payload": {
+              "url": "https://example.com/image3.gif",
+              "width": 500,
+              "height": 500,
+              "format": "gif"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "description": "Job con toons de tipo VIDEO",
+      "request": {
+        "jobId": "JOB-002",
+        "toons": [
+          {
+            "toonId": "TOON-004",
+            "type": "VIDEO",
+            "payload": {
+              "url": "https://example.com/video1.mp4",
+              "duration": 120,
+              "resolution": "1080p",
+              "codec": "h264"
+            }
+          },
+          {
+            "toonId": "TOON-005",
+            "type": "VIDEO",
+            "payload": {
+              "url": "https://example.com/video2.mp4",
+              "duration": 60,
+              "resolution": "720p",
+              "codec": "h264"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "description": "Job con tipos mixtos",
+      "request": {
+        "jobId": "JOB-003",
+        "toons": [
+          {
+            "toonId": "TOON-006",
+            "type": "TEXT",
+            "payload": {
+              "content": "Este es un texto de ejemplo para procesar",
+              "language": "es",
+              "wordCount": 8
+            }
+          },
+          {
+            "toonId": "TOON-007",
+            "type": "DOCUMENT",
+            "payload": {
+              "url": "https://example.com/doc.pdf",
+              "pages": 10,
+              "size": 2048000
+            }
+          },
+          {
+            "toonId": "TOON-008",
+            "type": "IMAGE",
+            "payload": {
+              "url": "https://example.com/chart.png",
+              "width": 1200,
+              "height": 800,
+              "format": "png"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
