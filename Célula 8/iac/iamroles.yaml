@@ -13,7 +13,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub 'purchase-orders-lambda-role-${Environment}'
+      RoleName: !Sub 'tigger-purchase-orders-lambda-role-${Environment}'
       Description: Execution role for Lambda functions in purchase order system
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -34,7 +34,7 @@ Resources:
   LambdaDynamoDBPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub 'lambda-dynamodb-policy-${Environment}'
+      PolicyName: !Sub 'tigger-lambda-dynamodb-policy-${Environment}'
       Roles:
         - !Ref LambdaExecutionRole
       PolicyDocument:
@@ -62,7 +62,7 @@ Resources:
   LambdaKMSPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub 'lambda-kms-policy-${Environment}'
+      PolicyName: !Sub 'tigger-lambda-kms-policy-${Environment}'
       Roles:
         - !Ref LambdaExecutionRole
       PolicyDocument:
@@ -80,7 +80,7 @@ Resources:
   LambdaCloudWatchLogsPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub 'lambda-cloudwatch-logs-policy-${Environment}'
+      PolicyName: !Sub 'tigger-lambda-cloudwatch-logs-policy-${Environment}'
       Roles:
         - !Ref LambdaExecutionRole
       PolicyDocument:
@@ -98,7 +98,7 @@ Resources:
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub 'purchase-orders-codebuild-role-${Environment}'
+      RoleName: !Sub 'tigger-purchase-orders-codebuild-role-${Environment}'
       Description: Service role for CodeBuild in purchase order system
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -119,7 +119,7 @@ Resources:
   CodeBuildCloudFormationPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub 'codebuild-cloudformation-policy-${Environment}'
+      PolicyName: !Sub 'tigger-codebuild-cloudformation-policy-${Environment}'
       Roles:
         - !Ref CodeBuildRole
       PolicyDocument:
@@ -140,7 +140,7 @@ Resources:
   CodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub 'purchase-orders-codepipeline-role-${Environment}'
+      RoleName: !Sub 'tigger-purchase-orders-codepipeline-role-${Environment}'
       Description: Service role for CodePipeline in purchase order system
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
