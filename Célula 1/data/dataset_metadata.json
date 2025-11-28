@@ -1,0 +1,2222 @@
+[
+  {
+    "ImageId": "ae1be708-3932-4e34-9573-6d187db5ab00",
+    "CharacterName": "Tweety Bird",
+    "Confidence": 83.38,
+    "Timestamp": "2025-11-15T22:50:35.336908Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "ae1be708-3932-4e34-9573-6d187db5ab00.png",
+      "imageSize": 1329593,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Tweety Bird",
+          "confidence": 83.38
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.51
+        },
+        {
+          "name": "Animation",
+          "confidence": 85.69
+        }
+      ],
+      "processingTime": 387
+    }
+  },
+  {
+    "ImageId": "84504894-bb58-4afe-9f1e-eff965f19e90",
+    "CharacterName": "Tweety Bird",
+    "Confidence": 92.61,
+    "Timestamp": "2025-11-09T10:29:08.337024Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "84504894-bb58-4afe-9f1e-eff965f19e90.jpeg",
+      "imageSize": 4241584,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Tweety Bird",
+          "confidence": 92.61
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.25
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.48
+        }
+      ],
+      "processingTime": 1581
+    }
+  },
+  {
+    "ImageId": "73c150d7-01c9-455d-a1e0-0f32726f2ccd",
+    "CharacterName": "Bart Simpson",
+    "Confidence": 92.71,
+    "Timestamp": "2025-11-26T19:56:58.337067Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "73c150d7-01c9-455d-a1e0-0f32726f2ccd.jpg",
+      "imageSize": 820899,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Bart Simpson",
+          "confidence": 92.71
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.27
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.02
+        }
+      ],
+      "processingTime": 1493
+    }
+  },
+  {
+    "ImageId": "cd502de4-aec0-420e-9b81-4bcb62c7733b",
+    "CharacterName": "Porky Pig",
+    "Confidence": 73.42,
+    "Timestamp": "2025-11-15T12:36:45.337101Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "cd502de4-aec0-420e-9b81-4bcb62c7733b.jpeg",
+      "imageSize": 596642,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Porky Pig",
+          "confidence": 73.42
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.08
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.35
+        }
+      ],
+      "processingTime": 911
+    }
+  },
+  {
+    "ImageId": "2c5a3e3a-cb48-4878-8034-47ef5e06fee3",
+    "CharacterName": "Patrick Star",
+    "Confidence": 79.82,
+    "Timestamp": "2025-11-20T08:57:23.337130Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "2c5a3e3a-cb48-4878-8034-47ef5e06fee3.jpg",
+      "imageSize": 527269,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 79.82
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.25
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.63
+        }
+      ],
+      "processingTime": 818
+    }
+  },
+  {
+    "ImageId": "1befa337-c33d-4c9d-9276-a79040ed4e66",
+    "CharacterName": "Donald Duck",
+    "Confidence": 93.64,
+    "Timestamp": "2025-11-09T07:49:17.337157Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "1befa337-c33d-4c9d-9276-a79040ed4e66.jpeg",
+      "imageSize": 906644,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Donald Duck",
+          "confidence": 93.64
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.83
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.54
+        }
+      ],
+      "processingTime": 1262
+    }
+  },
+  {
+    "ImageId": "835aa3fd-e62c-48b4-a3ae-e424bdcd0bc1",
+    "CharacterName": "Squidward Tentacles",
+    "Confidence": 72.67,
+    "Timestamp": "2025-11-14T06:08:22.337186Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "835aa3fd-e62c-48b4-a3ae-e424bdcd0bc1.jpeg",
+      "imageSize": 843506,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Squidward Tentacles",
+          "confidence": 72.67
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.91
+        },
+        {
+          "name": "Animation",
+          "confidence": 93.92
+        }
+      ],
+      "processingTime": 822
+    }
+  },
+  {
+    "ImageId": "d4c783f8-6f74-45ff-830e-9edb941176da",
+    "CharacterName": "Tom Cat",
+    "Confidence": 91.56,
+    "Timestamp": "2025-11-20T04:22:54.337211Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "d4c783f8-6f74-45ff-830e-9edb941176da.jpeg",
+      "imageSize": 326913,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 91.56
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.89
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.73
+        }
+      ],
+      "processingTime": 1597
+    }
+  },
+  {
+    "ImageId": "8527996d-e6e9-4deb-97c3-1c5699e782bd",
+    "CharacterName": "Yogi Bear",
+    "Confidence": 74.03,
+    "Timestamp": "2025-11-01T01:18:25.337237Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "8527996d-e6e9-4deb-97c3-1c5699e782bd.jpeg",
+      "imageSize": 424886,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Yogi Bear",
+          "confidence": 74.03
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.28
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.04
+        }
+      ],
+      "processingTime": 956
+    }
+  },
+  {
+    "ImageId": "b3e455d4-8655-4905-9e69-d76079b07bd4",
+    "CharacterName": "Tom Cat",
+    "Confidence": 79.3,
+    "Timestamp": "2025-11-08T01:35:16.337262Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "b3e455d4-8655-4905-9e69-d76079b07bd4.jpeg",
+      "imageSize": 1344537,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 79.3
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.27
+        },
+        {
+          "name": "Animation",
+          "confidence": 87.13
+        }
+      ],
+      "processingTime": 1770
+    }
+  },
+  {
+    "ImageId": "99ee5d52-320d-4936-b3d9-ac1b97e42e58",
+    "CharacterName": "Patrick Star",
+    "Confidence": 76.71,
+    "Timestamp": "2025-11-17T15:07:17.337286Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "99ee5d52-320d-4936-b3d9-ac1b97e42e58.jpg",
+      "imageSize": 795161,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 76.71
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.91
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.08
+        }
+      ],
+      "processingTime": 1077
+    }
+  },
+  {
+    "ImageId": "20c364cb-a46b-4d13-8644-7af69ecf01ad",
+    "CharacterName": "Scooby-Doo",
+    "Confidence": 88.72,
+    "Timestamp": "2025-10-31T23:41:44.337314Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "20c364cb-a46b-4d13-8644-7af69ecf01ad.jpg",
+      "imageSize": 516651,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Scooby-Doo",
+          "confidence": 88.72
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.05
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.24
+        }
+      ],
+      "processingTime": 1650
+    }
+  },
+  {
+    "ImageId": "f4a9d911-8884-407f-bc73-85dfa84da85f",
+    "CharacterName": "Mickey Mouse",
+    "Confidence": 99.3,
+    "Timestamp": "2025-11-08T10:04:24.337341Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "f4a9d911-8884-407f-bc73-85dfa84da85f.jpg",
+      "imageSize": 3940849,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Mickey Mouse",
+          "confidence": 99.3
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.52
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.62
+        }
+      ],
+      "processingTime": 878
+    }
+  },
+  {
+    "ImageId": "22452726-5975-492c-a496-ef4b359a33dc",
+    "CharacterName": "SpongeBob SquarePants",
+    "Confidence": 97.6,
+    "Timestamp": "2025-11-25T09:20:21.337376Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "22452726-5975-492c-a496-ef4b359a33dc.jpg",
+      "imageSize": 1665442,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "SpongeBob SquarePants",
+          "confidence": 97.6
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 95.74
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.99
+        }
+      ],
+      "processingTime": 763
+    }
+  },
+  {
+    "ImageId": "baaa5834-b9e1-4735-8e47-8c0fe40a101b",
+    "CharacterName": "Bugs Bunny",
+    "Confidence": 71.94,
+    "Timestamp": "2025-11-13T21:07:54.337404Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "baaa5834-b9e1-4735-8e47-8c0fe40a101b.jpg",
+      "imageSize": 2151990,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Bugs Bunny",
+          "confidence": 71.94
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.36
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.39
+        }
+      ],
+      "processingTime": 266
+    }
+  },
+  {
+    "ImageId": "ef43163f-d767-4bbe-8b7e-bd39b314ea88",
+    "CharacterName": "Fred Flintstone",
+    "Confidence": 76.51,
+    "Timestamp": "2025-10-30T21:16:05.337429Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "ef43163f-d767-4bbe-8b7e-bd39b314ea88.jpg",
+      "imageSize": 2658970,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Fred Flintstone",
+          "confidence": 76.51
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 96.23
+        },
+        {
+          "name": "Animation",
+          "confidence": 93.99
+        }
+      ],
+      "processingTime": 759
+    }
+  },
+  {
+    "ImageId": "bf105cd4-8fc0-48ef-971c-de9580e78d23",
+    "CharacterName": "Patrick Star",
+    "Confidence": 78.56,
+    "Timestamp": "2025-11-06T22:26:25.337454Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "bf105cd4-8fc0-48ef-971c-de9580e78d23.jpeg",
+      "imageSize": 630943,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 78.56
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 95.07
+        },
+        {
+          "name": "Animation",
+          "confidence": 96.09
+        }
+      ],
+      "processingTime": 1014
+    }
+  },
+  {
+    "ImageId": "7140a238-c77e-43de-aae4-3ae0e240f1f2",
+    "CharacterName": "Daffy Duck",
+    "Confidence": 85.62,
+    "Timestamp": "2025-11-26T11:34:38.337478Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "7140a238-c77e-43de-aae4-3ae0e240f1f2.jpg",
+      "imageSize": 1700705,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Daffy Duck",
+          "confidence": 85.62
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.27
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.01
+        }
+      ],
+      "processingTime": 1053
+    }
+  },
+  {
+    "ImageId": "c7fbddb6-cfa5-4187-a667-1990481c74c6",
+    "CharacterName": "Mickey Mouse",
+    "Confidence": 70.59,
+    "Timestamp": "2025-10-29T06:19:10.337501Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "c7fbddb6-cfa5-4187-a667-1990481c74c6.png",
+      "imageSize": 560215,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Mickey Mouse",
+          "confidence": 70.59
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.96
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.62
+        }
+      ],
+      "processingTime": 1791
+    }
+  },
+  {
+    "ImageId": "b3450723-4b3d-49b1-a31c-9da5ba7d1fb3",
+    "CharacterName": "Bart Simpson",
+    "Confidence": 90.0,
+    "Timestamp": "2025-10-27T20:41:35.337529Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "b3450723-4b3d-49b1-a31c-9da5ba7d1fb3.jpg",
+      "imageSize": 2995404,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Bart Simpson",
+          "confidence": 90.0
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.68
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.15
+        }
+      ],
+      "processingTime": 1192
+    }
+  },
+  {
+    "ImageId": "122c9813-90dd-44d5-a6de-2187cebfc7c2",
+    "CharacterName": "Scooby-Doo",
+    "Confidence": 85.06,
+    "Timestamp": "2025-11-17T16:30:44.337553Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "122c9813-90dd-44d5-a6de-2187cebfc7c2.jpeg",
+      "imageSize": 320899,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Scooby-Doo",
+          "confidence": 85.06
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.65
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.15
+        }
+      ],
+      "processingTime": 798
+    }
+  },
+  {
+    "ImageId": "1181a062-6268-46dd-ad7c-5a0c333483e8",
+    "CharacterName": "Sylvester Cat",
+    "Confidence": 80.94,
+    "Timestamp": "2025-10-29T10:24:56.337579Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "1181a062-6268-46dd-ad7c-5a0c333483e8.png",
+      "imageSize": 604998,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Sylvester Cat",
+          "confidence": 80.94
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.01
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.05
+        }
+      ],
+      "processingTime": 1182
+    }
+  },
+  {
+    "ImageId": "1f6601fd-74cd-4177-8a87-091647d5fb28",
+    "CharacterName": "Homer Simpson",
+    "Confidence": 94.54,
+    "Timestamp": "2025-11-16T06:22:35.337603Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "1f6601fd-74cd-4177-8a87-091647d5fb28.png",
+      "imageSize": 2912254,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Homer Simpson",
+          "confidence": 94.54
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.06
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.52
+        }
+      ],
+      "processingTime": 393
+    }
+  },
+  {
+    "ImageId": "e9714fda-8cf0-4708-9404-90ae154e0a1a",
+    "CharacterName": "Tom Cat",
+    "Confidence": 84.67,
+    "Timestamp": "2025-11-27T03:16:47.337629Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "e9714fda-8cf0-4708-9404-90ae154e0a1a.jpg",
+      "imageSize": 325157,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 84.67
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.18
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.25
+        }
+      ],
+      "processingTime": 505
+    }
+  },
+  {
+    "ImageId": "848e0d53-8c7e-42b7-9cad-f9555847a081",
+    "CharacterName": "Fred Flintstone",
+    "Confidence": 80.64,
+    "Timestamp": "2025-11-12T06:07:12.337653Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "848e0d53-8c7e-42b7-9cad-f9555847a081.png",
+      "imageSize": 447432,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Fred Flintstone",
+          "confidence": 80.64
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.2
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.27
+        }
+      ],
+      "processingTime": 1015
+    }
+  },
+  {
+    "ImageId": "ffa1bb06-e0c4-4d39-9144-450cdb6f08bf",
+    "CharacterName": "Bart Simpson",
+    "Confidence": 94.13,
+    "Timestamp": "2025-11-12T17:12:05.337679Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "ffa1bb06-e0c4-4d39-9144-450cdb6f08bf.jpeg",
+      "imageSize": 1711118,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Bart Simpson",
+          "confidence": 94.13
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.43
+        },
+        {
+          "name": "Animation",
+          "confidence": 92.44
+        }
+      ],
+      "processingTime": 1306
+    }
+  },
+  {
+    "ImageId": "ddf6c8f1-9933-473a-8ff0-c0a376293532",
+    "CharacterName": "Pikachu",
+    "Confidence": 83.66,
+    "Timestamp": "2025-11-12T17:47:06.337702Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "ddf6c8f1-9933-473a-8ff0-c0a376293532.jpg",
+      "imageSize": 3734942,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Pikachu",
+          "confidence": 83.66
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 93.45
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.81
+        }
+      ],
+      "processingTime": 641
+    }
+  },
+  {
+    "ImageId": "77deea17-d307-4bfd-80f0-01fe68b283f8",
+    "CharacterName": "Daffy Duck",
+    "Confidence": 73.47,
+    "Timestamp": "2025-11-11T15:23:51.337725Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "77deea17-d307-4bfd-80f0-01fe68b283f8.jpeg",
+      "imageSize": 2432509,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Daffy Duck",
+          "confidence": 73.47
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 95.88
+        },
+        {
+          "name": "Animation",
+          "confidence": 96.71
+        }
+      ],
+      "processingTime": 309
+    }
+  },
+  {
+    "ImageId": "b1e12b36-9249-456b-b778-f3942de980e9",
+    "CharacterName": "Tweety Bird",
+    "Confidence": 74.36,
+    "Timestamp": "2025-11-16T12:30:35.337748Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "b1e12b36-9249-456b-b778-f3942de980e9.jpeg",
+      "imageSize": 2743959,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Tweety Bird",
+          "confidence": 74.36
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.66
+        },
+        {
+          "name": "Animation",
+          "confidence": 92.28
+        }
+      ],
+      "processingTime": 1964
+    }
+  },
+  {
+    "ImageId": "bfdcb2a3-7dba-4bcb-83a4-1f00759c8fe3",
+    "CharacterName": "Wile E. Coyote",
+    "Confidence": 97.97,
+    "Timestamp": "2025-11-13T02:32:12.337771Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "bfdcb2a3-7dba-4bcb-83a4-1f00759c8fe3.jpg",
+      "imageSize": 1068871,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Wile E. Coyote",
+          "confidence": 97.97
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.51
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.44
+        }
+      ],
+      "processingTime": 1394
+    }
+  },
+  {
+    "ImageId": "b1c303d2-3a7a-47b8-b6e0-b383e248e60a",
+    "CharacterName": "Yogi Bear",
+    "Confidence": 74.93,
+    "Timestamp": "2025-11-01T06:05:00.337796Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "b1c303d2-3a7a-47b8-b6e0-b383e248e60a.png",
+      "imageSize": 875050,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Yogi Bear",
+          "confidence": 74.93
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.8
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.19
+        }
+      ],
+      "processingTime": 1492
+    }
+  },
+  {
+    "ImageId": "8bf689b0-1269-4c4c-b950-9682d4a4e875",
+    "CharacterName": "Sylvester Cat",
+    "Confidence": 87.12,
+    "Timestamp": "2025-11-19T16:31:43.337819Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "8bf689b0-1269-4c4c-b950-9682d4a4e875.png",
+      "imageSize": 2383798,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Sylvester Cat",
+          "confidence": 87.12
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.97
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.52
+        }
+      ],
+      "processingTime": 428
+    }
+  },
+  {
+    "ImageId": "96aa1af4-88d8-4fcc-965b-2e6d84a09e44",
+    "CharacterName": "Bugs Bunny",
+    "Confidence": 83.39,
+    "Timestamp": "2025-11-22T19:58:30.337844Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "96aa1af4-88d8-4fcc-965b-2e6d84a09e44.jpeg",
+      "imageSize": 2822439,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Bugs Bunny",
+          "confidence": 83.39
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 93.12
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.03
+        }
+      ],
+      "processingTime": 1061
+    }
+  },
+  {
+    "ImageId": "16cbb798-cf45-464a-ac99-1ba6b5c0c987",
+    "CharacterName": "Donald Duck",
+    "Confidence": 99.43,
+    "Timestamp": "2025-11-14T08:00:07.337867Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "16cbb798-cf45-464a-ac99-1ba6b5c0c987.png",
+      "imageSize": 4161790,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Donald Duck",
+          "confidence": 99.43
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.38
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.11
+        }
+      ],
+      "processingTime": 929
+    }
+  },
+  {
+    "ImageId": "46dbfa75-6da9-4c01-a09b-1890b090c72c",
+    "CharacterName": "Porky Pig",
+    "Confidence": 98.91,
+    "Timestamp": "2025-11-02T01:34:19.337890Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "46dbfa75-6da9-4c01-a09b-1890b090c72c.jpeg",
+      "imageSize": 1302009,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Porky Pig",
+          "confidence": 98.91
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 93.66
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.49
+        }
+      ],
+      "processingTime": 786
+    }
+  },
+  {
+    "ImageId": "4c78733d-f00b-4790-8715-2cbee84a8160",
+    "CharacterName": "Homer Simpson",
+    "Confidence": 84.54,
+    "Timestamp": "2025-10-29T22:28:19.337913Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "4c78733d-f00b-4790-8715-2cbee84a8160.png",
+      "imageSize": 1602064,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Homer Simpson",
+          "confidence": 84.54
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 96.26
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.99
+        }
+      ],
+      "processingTime": 1809
+    }
+  },
+  {
+    "ImageId": "8aad99f7-9dfc-4759-bffe-fc1940d9c2f3",
+    "CharacterName": "Bart Simpson",
+    "Confidence": 81.81,
+    "Timestamp": "2025-11-14T15:56:53.337934Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "8aad99f7-9dfc-4759-bffe-fc1940d9c2f3.png",
+      "imageSize": 3805441,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Bart Simpson",
+          "confidence": 81.81
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.08
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.53
+        }
+      ],
+      "processingTime": 1939
+    }
+  },
+  {
+    "ImageId": "8127700a-0b6c-441e-91e5-799bf9e45f65",
+    "CharacterName": "Patrick Star",
+    "Confidence": 80.23,
+    "Timestamp": "2025-11-26T06:09:01.337955Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "8127700a-0b6c-441e-91e5-799bf9e45f65.png",
+      "imageSize": 2985828,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 80.23
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.78
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.84
+        }
+      ],
+      "processingTime": 469
+    }
+  },
+  {
+    "ImageId": "f20f5b15-f7a2-4b4e-81cc-67ed3a8e5aaa",
+    "CharacterName": "Wile E. Coyote",
+    "Confidence": 78.37,
+    "Timestamp": "2025-11-14T15:50:44.338002Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "f20f5b15-f7a2-4b4e-81cc-67ed3a8e5aaa.png",
+      "imageSize": 2466706,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Wile E. Coyote",
+          "confidence": 78.37
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.75
+        },
+        {
+          "name": "Animation",
+          "confidence": 93.06
+        }
+      ],
+      "processingTime": 186
+    }
+  },
+  {
+    "ImageId": "dd9c3127-14c7-4d3e-82ee-074c3e6eb4d3",
+    "CharacterName": "Bart Simpson",
+    "Confidence": 95.93,
+    "Timestamp": "2025-11-14T20:10:09.338031Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "dd9c3127-14c7-4d3e-82ee-074c3e6eb4d3.jpeg",
+      "imageSize": 452891,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Bart Simpson",
+          "confidence": 95.93
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.82
+        },
+        {
+          "name": "Animation",
+          "confidence": 93.01
+        }
+      ],
+      "processingTime": 1194
+    }
+  },
+  {
+    "ImageId": "6d654304-d54f-43c6-8c1f-2ea6b64f41bb",
+    "CharacterName": "Tom Cat",
+    "Confidence": 95.55,
+    "Timestamp": "2025-11-11T12:29:22.338056Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "6d654304-d54f-43c6-8c1f-2ea6b64f41bb.png",
+      "imageSize": 539420,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 95.55
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.31
+        },
+        {
+          "name": "Animation",
+          "confidence": 85.07
+        }
+      ],
+      "processingTime": 404
+    }
+  },
+  {
+    "ImageId": "724ea805-487a-4984-af3c-bfc15eb6490a",
+    "CharacterName": "Daffy Duck",
+    "Confidence": 78.02,
+    "Timestamp": "2025-11-03T13:32:31.338080Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "724ea805-487a-4984-af3c-bfc15eb6490a.png",
+      "imageSize": 406010,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Daffy Duck",
+          "confidence": 78.02
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.12
+        },
+        {
+          "name": "Animation",
+          "confidence": 96.09
+        }
+      ],
+      "processingTime": 1500
+    }
+  },
+  {
+    "ImageId": "e21a83e7-5309-4fc0-b5ab-da64706bfa93",
+    "CharacterName": "Wile E. Coyote",
+    "Confidence": 80.73,
+    "Timestamp": "2025-11-26T20:12:58.338106Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "e21a83e7-5309-4fc0-b5ab-da64706bfa93.jpg",
+      "imageSize": 1880910,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Wile E. Coyote",
+          "confidence": 80.73
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.39
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.19
+        }
+      ],
+      "processingTime": 1332
+    }
+  },
+  {
+    "ImageId": "0f8c1780-e50a-4b78-b3aa-9b55da1f426b",
+    "CharacterName": "Tweety Bird",
+    "Confidence": 98.05,
+    "Timestamp": "2025-11-05T19:44:06.338133Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "0f8c1780-e50a-4b78-b3aa-9b55da1f426b.jpeg",
+      "imageSize": 622653,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Tweety Bird",
+          "confidence": 98.05
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.3
+        },
+        {
+          "name": "Animation",
+          "confidence": 87.92
+        }
+      ],
+      "processingTime": 1551
+    }
+  },
+  {
+    "ImageId": "edf1a722-df96-4887-9018-9ddadfb33be7",
+    "CharacterName": "Porky Pig",
+    "Confidence": 82.28,
+    "Timestamp": "2025-11-26T14:24:52.338157Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "edf1a722-df96-4887-9018-9ddadfb33be7.jpeg",
+      "imageSize": 803685,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Porky Pig",
+          "confidence": 82.28
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 93.85
+        },
+        {
+          "name": "Animation",
+          "confidence": 96.76
+        }
+      ],
+      "processingTime": 676
+    }
+  },
+  {
+    "ImageId": "5bedec95-2e9c-4937-96c7-e48886ed1345",
+    "CharacterName": "Pikachu",
+    "Confidence": 87.05,
+    "Timestamp": "2025-10-30T18:43:15.338182Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "5bedec95-2e9c-4937-96c7-e48886ed1345.jpeg",
+      "imageSize": 461186,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Pikachu",
+          "confidence": 87.05
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 95.65
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.19
+        }
+      ],
+      "processingTime": 1914
+    }
+  },
+  {
+    "ImageId": "ec1c4b5a-d395-41ee-a8bc-3aa116831954",
+    "CharacterName": "Wile E. Coyote",
+    "Confidence": 72.74,
+    "Timestamp": "2025-11-26T19:50:48.338206Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "ec1c4b5a-d395-41ee-a8bc-3aa116831954.jpeg",
+      "imageSize": 996259,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Wile E. Coyote",
+          "confidence": 72.74
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.19
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.61
+        }
+      ],
+      "processingTime": 668
+    }
+  },
+  {
+    "ImageId": "bf0c54b0-80cd-40ec-ae58-e59bfe954a51",
+    "CharacterName": "SpongeBob SquarePants",
+    "Confidence": 73.96,
+    "Timestamp": "2025-11-24T13:47:45.338228Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "bf0c54b0-80cd-40ec-ae58-e59bfe954a51.jpeg",
+      "imageSize": 866048,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "SpongeBob SquarePants",
+          "confidence": 73.96
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.28
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.59
+        }
+      ],
+      "processingTime": 1448
+    }
+  },
+  {
+    "ImageId": "b5c32206-2a53-4d28-86a8-88adb80b5f05",
+    "CharacterName": "Road Runner",
+    "Confidence": 95.58,
+    "Timestamp": "2025-10-28T10:07:39.338254Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "b5c32206-2a53-4d28-86a8-88adb80b5f05.png",
+      "imageSize": 876433,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Road Runner",
+          "confidence": 95.58
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 96.46
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.14
+        }
+      ],
+      "processingTime": 1670
+    }
+  },
+  {
+    "ImageId": "0e9b7ad8-cd8c-4a11-bcb4-e2572a9eb146",
+    "CharacterName": "Fred Flintstone",
+    "Confidence": 76.7,
+    "Timestamp": "2025-11-06T14:54:00.338277Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "0e9b7ad8-cd8c-4a11-bcb4-e2572a9eb146.jpeg",
+      "imageSize": 531048,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Fred Flintstone",
+          "confidence": 76.7
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 95.29
+        },
+        {
+          "name": "Animation",
+          "confidence": 89.99
+        }
+      ],
+      "processingTime": 263
+    }
+  },
+  {
+    "ImageId": "2d8d000c-359a-4028-87bb-93306b6d1136",
+    "CharacterName": "Tom Cat",
+    "Confidence": 81.3,
+    "Timestamp": "2025-11-18T20:22:34.338300Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "2d8d000c-359a-4028-87bb-93306b6d1136.png",
+      "imageSize": 1830271,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 81.3
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.98
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.85
+        }
+      ],
+      "processingTime": 1592
+    }
+  },
+  {
+    "ImageId": "326d33b4-21e9-41e5-b6f5-103fd3d15c70",
+    "CharacterName": "Bugs Bunny",
+    "Confidence": 93.01,
+    "Timestamp": "2025-11-02T01:47:46.338326Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "326d33b4-21e9-41e5-b6f5-103fd3d15c70.jpeg",
+      "imageSize": 762397,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Bugs Bunny",
+          "confidence": 93.01
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.97
+        },
+        {
+          "name": "Animation",
+          "confidence": 87.69
+        }
+      ],
+      "processingTime": 776
+    }
+  },
+  {
+    "ImageId": "e90a3931-3688-47b9-9b66-240a5001858a",
+    "CharacterName": "Homer Simpson",
+    "Confidence": 79.67,
+    "Timestamp": "2025-11-07T00:06:30.338349Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "e90a3931-3688-47b9-9b66-240a5001858a.png",
+      "imageSize": 533394,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Homer Simpson",
+          "confidence": 79.67
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 98.84
+        },
+        {
+          "name": "Animation",
+          "confidence": 93.12
+        }
+      ],
+      "processingTime": 1462
+    }
+  },
+  {
+    "ImageId": "3d89baf9-444c-4566-adc1-d9ef1ac56fe4",
+    "CharacterName": "Donald Duck",
+    "Confidence": 86.99,
+    "Timestamp": "2025-11-12T06:22:21.338388Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "3d89baf9-444c-4566-adc1-d9ef1ac56fe4.jpeg",
+      "imageSize": 1559134,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Donald Duck",
+          "confidence": 86.99
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 96.42
+        },
+        {
+          "name": "Animation",
+          "confidence": 91.15
+        }
+      ],
+      "processingTime": 1826
+    }
+  },
+  {
+    "ImageId": "a65a9380-5948-4e68-9bf0-185abf7bd7f1",
+    "CharacterName": "Jerry Mouse",
+    "Confidence": 76.52,
+    "Timestamp": "2025-11-14T01:33:16.338412Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "a65a9380-5948-4e68-9bf0-185abf7bd7f1.jpg",
+      "imageSize": 3708114,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Jerry Mouse",
+          "confidence": 76.52
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.13
+        },
+        {
+          "name": "Animation",
+          "confidence": 96.2
+        }
+      ],
+      "processingTime": 1471
+    }
+  },
+  {
+    "ImageId": "11a2d9c1-9e09-481c-a135-911f1dceef97",
+    "CharacterName": "Scooby-Doo",
+    "Confidence": 76.01,
+    "Timestamp": "2025-11-27T00:52:30.338434Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "11a2d9c1-9e09-481c-a135-911f1dceef97.jpeg",
+      "imageSize": 546700,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Scooby-Doo",
+          "confidence": 76.01
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 92.03
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.33
+        }
+      ],
+      "processingTime": 573
+    }
+  },
+  {
+    "ImageId": "803ba5ba-5d5d-47d8-8ee2-62f3b36bd62a",
+    "CharacterName": "Donald Duck",
+    "Confidence": 70.86,
+    "Timestamp": "2025-11-02T19:47:31.338456Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "803ba5ba-5d5d-47d8-8ee2-62f3b36bd62a.jpg",
+      "imageSize": 3555500,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Donald Duck",
+          "confidence": 70.86
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.31
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.27
+        }
+      ],
+      "processingTime": 453
+    }
+  },
+  {
+    "ImageId": "61b513e9-90ee-4b73-8580-444930967ca5",
+    "CharacterName": "Daffy Duck",
+    "Confidence": 83.48,
+    "Timestamp": "2025-11-13T02:32:54.338484Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "61b513e9-90ee-4b73-8580-444930967ca5.jpeg",
+      "imageSize": 3894732,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Daffy Duck",
+          "confidence": 83.48
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.6
+        },
+        {
+          "name": "Animation",
+          "confidence": 90.72
+        }
+      ],
+      "processingTime": 1975
+    }
+  },
+  {
+    "ImageId": "9c306c9f-fc8a-4992-8e9e-a1619ba13158",
+    "CharacterName": "Sylvester Cat",
+    "Confidence": 93.47,
+    "Timestamp": "2025-11-23T07:34:24.338507Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "9c306c9f-fc8a-4992-8e9e-a1619ba13158.jpeg",
+      "imageSize": 335557,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Sylvester Cat",
+          "confidence": 93.47
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.04
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.56
+        }
+      ],
+      "processingTime": 1349
+    }
+  },
+  {
+    "ImageId": "50d68f7d-3eaf-4aa6-834c-0ab1a998cf2d",
+    "CharacterName": "Patrick Star",
+    "Confidence": 95.99,
+    "Timestamp": "2025-11-14T12:05:11.338529Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "50d68f7d-3eaf-4aa6-834c-0ab1a998cf2d.png",
+      "imageSize": 2469393,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 95.99
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 93.64
+        },
+        {
+          "name": "Animation",
+          "confidence": 91.58
+        }
+      ],
+      "processingTime": 769
+    }
+  },
+  {
+    "ImageId": "1ed997e9-c299-455d-a03d-c489dee6c5ed",
+    "CharacterName": "Homer Simpson",
+    "Confidence": 99.13,
+    "Timestamp": "2025-10-30T04:19:17.338550Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "1ed997e9-c299-455d-a03d-c489dee6c5ed.jpg",
+      "imageSize": 506211,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Homer Simpson",
+          "confidence": 99.13
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 95.79
+        },
+        {
+          "name": "Animation",
+          "confidence": 97.49
+        }
+      ],
+      "processingTime": 1812
+    }
+  },
+  {
+    "ImageId": "f5f13eb4-fd0d-4989-92ad-75344d916afa",
+    "CharacterName": "Squidward Tentacles",
+    "Confidence": 82.48,
+    "Timestamp": "2025-11-11T13:41:11.338572Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "f5f13eb4-fd0d-4989-92ad-75344d916afa.jpg",
+      "imageSize": 1374331,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Squidward Tentacles",
+          "confidence": 82.48
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 96.64
+        },
+        {
+          "name": "Animation",
+          "confidence": 91.61
+        }
+      ],
+      "processingTime": 384
+    }
+  },
+  {
+    "ImageId": "e523ceb3-835c-4adc-b0c3-35dd91d4a41f",
+    "CharacterName": "Pikachu",
+    "Confidence": 97.29,
+    "Timestamp": "2025-11-06T14:04:07.339495Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "e523ceb3-835c-4adc-b0c3-35dd91d4a41f.jpeg",
+      "imageSize": 704389,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Pikachu",
+          "confidence": 97.29
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 97.29
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.7
+        }
+      ],
+      "processingTime": 1652
+    }
+  },
+  {
+    "ImageId": "c9d71b4e-d207-448f-94cc-ee2122553235",
+    "CharacterName": "Squidward Tentacles",
+    "Confidence": 77.75,
+    "Timestamp": "2025-11-17T22:37:33.339554Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "c9d71b4e-d207-448f-94cc-ee2122553235.png",
+      "imageSize": 3215800,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "Squidward Tentacles",
+          "confidence": 77.75
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.2
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.75
+        }
+      ],
+      "processingTime": 1668
+    }
+  },
+  {
+    "ImageId": "405bd0ab-328f-4001-ad0a-d547f9308e6d",
+    "CharacterName": "Tom Cat",
+    "Confidence": 75.31,
+    "Timestamp": "2025-10-29T08:52:48.339607Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "405bd0ab-328f-4001-ad0a-d547f9308e6d.jpg",
+      "imageSize": 1575937,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 75.31
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.49
+        },
+        {
+          "name": "Animation",
+          "confidence": 88.81
+        }
+      ],
+      "processingTime": 1691
+    }
+  },
+  {
+    "ImageId": "8926d13d-6962-4f26-8533-ebc3f5365f51",
+    "CharacterName": "Pikachu",
+    "Confidence": 76.59,
+    "Timestamp": "2025-11-24T16:53:47.339646Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "8926d13d-6962-4f26-8533-ebc3f5365f51.jpeg",
+      "imageSize": 811658,
+      "dimensions": {
+        "width": 800,
+        "height": 600
+      },
+      "labels": [
+        {
+          "name": "Pikachu",
+          "confidence": 76.59
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.42
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.62
+        }
+      ],
+      "processingTime": 1408
+    }
+  },
+  {
+    "ImageId": "7362e898-6848-4082-8b2c-52335fb1974e",
+    "CharacterName": "Daffy Duck",
+    "Confidence": 80.53,
+    "Timestamp": "2025-11-27T04:50:30.339683Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "7362e898-6848-4082-8b2c-52335fb1974e.jpeg",
+      "imageSize": 1375950,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Daffy Duck",
+          "confidence": 80.53
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.23
+        },
+        {
+          "name": "Animation",
+          "confidence": 87.06
+        }
+      ],
+      "processingTime": 1216
+    }
+  },
+  {
+    "ImageId": "37683952-5927-4b35-bf6c-50aa9d4e46b2",
+    "CharacterName": "Patrick Star",
+    "Confidence": 71.22,
+    "Timestamp": "2025-11-10T07:15:51.339716Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "37683952-5927-4b35-bf6c-50aa9d4e46b2.jpeg",
+      "imageSize": 570358,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 71.22
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 93.39
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.41
+        }
+      ],
+      "processingTime": 130
+    }
+  },
+  {
+    "ImageId": "00f1d17c-2a44-4769-b684-53e4ceb2fbe2",
+    "CharacterName": "Tom Cat",
+    "Confidence": 98.97,
+    "Timestamp": "2025-11-05T14:02:01.339749Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "00f1d17c-2a44-4769-b684-53e4ceb2fbe2.jpg",
+      "imageSize": 809849,
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 98.97
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.04
+        },
+        {
+          "name": "Animation",
+          "confidence": 95.83
+        }
+      ],
+      "processingTime": 1829
+    }
+  },
+  {
+    "ImageId": "9d1ba805-419a-4194-a19c-8c674f268be6",
+    "CharacterName": "Patrick Star",
+    "Confidence": 87.05,
+    "Timestamp": "2025-10-29T03:37:34.339783Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "9d1ba805-419a-4194-a19c-8c674f268be6.jpg",
+      "imageSize": 2850837,
+      "dimensions": {
+        "width": 1600,
+        "height": 900
+      },
+      "labels": [
+        {
+          "name": "Patrick Star",
+          "confidence": 87.05
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.7
+        },
+        {
+          "name": "Animation",
+          "confidence": 86.85
+        }
+      ],
+      "processingTime": 1884
+    }
+  },
+  {
+    "ImageId": "834dd6b5-a453-4e3d-97b1-c2562db3ef64",
+    "CharacterName": "Tom Cat",
+    "Confidence": 98.23,
+    "Timestamp": "2025-11-23T08:17:57.339816Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "834dd6b5-a453-4e3d-97b1-c2562db3ef64.jpg",
+      "imageSize": 1669321,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Tom Cat",
+          "confidence": 98.23
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 90.64
+        },
+        {
+          "name": "Animation",
+          "confidence": 87.9
+        }
+      ],
+      "processingTime": 1748
+    }
+  },
+  {
+    "ImageId": "c8e53db2-fadc-442e-a8cb-e732b8bf8ca2",
+    "CharacterName": "Yogi Bear",
+    "Confidence": 92.99,
+    "Timestamp": "2025-11-17T02:15:46.339847Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "c8e53db2-fadc-442e-a8cb-e732b8bf8ca2.png",
+      "imageSize": 444656,
+      "dimensions": {
+        "width": 640,
+        "height": 480
+      },
+      "labels": [
+        {
+          "name": "Yogi Bear",
+          "confidence": 92.99
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 99.1
+        },
+        {
+          "name": "Animation",
+          "confidence": 93.98
+        }
+      ],
+      "processingTime": 808
+    }
+  },
+  {
+    "ImageId": "629aa838-ed2a-4f81-8e98-eeac63679bf1",
+    "CharacterName": "SpongeBob SquarePants",
+    "Confidence": 93.34,
+    "Timestamp": "2025-11-16T19:47:31.339876Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "629aa838-ed2a-4f81-8e98-eeac63679bf1.jpeg",
+      "imageSize": 4078479,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "labels": [
+        {
+          "name": "SpongeBob SquarePants",
+          "confidence": 93.34
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 91.89
+        },
+        {
+          "name": "Animation",
+          "confidence": 91.93
+        }
+      ],
+      "processingTime": 1680
+    }
+  },
+  {
+    "ImageId": "eebc00d3-a40e-481a-82ab-3e4834d81176",
+    "CharacterName": "Sylvester Cat",
+    "Confidence": 86.91,
+    "Timestamp": "2025-11-09T00:15:49.339906Z",
+    "Metadata": {
+      "s3Bucket": "cartoon-rekognition-images-sandbox",
+      "s3Key": "eebc00d3-a40e-481a-82ab-3e4834d81176.jpeg",
+      "imageSize": 1174390,
+      "dimensions": {
+        "width": 1280,
+        "height": 720
+      },
+      "labels": [
+        {
+          "name": "Sylvester Cat",
+          "confidence": 86.91
+        },
+        {
+          "name": "Cartoon",
+          "confidence": 94.75
+        },
+        {
+          "name": "Animation",
+          "confidence": 92.07
+        }
+      ],
+      "processingTime": 1775
+    }
+  }
+]
