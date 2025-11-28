@@ -9,10 +9,12 @@ Parameters:
   
   SandboxAccountId:
     Type: String
+    Default: '372641111303'
     Description: Account ID de la cuenta Sandbox
   
   ProdAccountId:
     Type: String
+    Default: '372641111303'
     Description: Account ID de la cuenta Producción
 
 Resources:

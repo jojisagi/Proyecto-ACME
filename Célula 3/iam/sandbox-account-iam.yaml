@@ -9,6 +9,7 @@ Parameters:
   
   BuildAccountId:
     Type: String
+    Default: '372641111303'
     Description: Account ID de la cuenta Build
 
 Resources:
@@ -17,7 +18,7 @@ Resources:
   CrossAccountDeploymentRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${ProjectName}-cross-account-role'
+      RoleName: !Sub '${ProjectName}-cross-account-role-sandbox'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -142,7 +143,7 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${ProjectName}-cfn-execution-role-sandbox'
+      RoleName: !Sub '${ProjectName}-cfn-role-sandbox'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
