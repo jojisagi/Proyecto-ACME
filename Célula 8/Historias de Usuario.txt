@@ -1,0 +1,11 @@
+HU-8.1 – Recibir orden desde el e-commerce
+
+Como microservicio
+Quiero recibir eventos de compra
+Para generar agregados automáticos.
+
+HU-8.2 – Consultar ventas agregadas
+
+Como analista de ventas
+Quiero ver ventas por gadget/día/mes
+Para tomar decisiones estratégicas.

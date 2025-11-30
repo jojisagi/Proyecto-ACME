@@ -1,0 +1,11 @@
+HU-3.1 – Subir imagen de producto
+
+Como administrador del catálogo
+Quiero subir imágenes de gadgets
+Para procesarlas y generar thumbnails.
+
+HU-3.2 – Consultar metadatos de imágenes
+
+Como usuario autenticado
+Quiero consultar las versiones optimizadas
+Para integrarlas en la plataforma de e-commerce.

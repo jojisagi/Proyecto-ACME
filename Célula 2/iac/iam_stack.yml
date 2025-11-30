@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM Roles y Políticas para Sistema de Scheduling de Órdenes de Compra - Acme Inc.'
+
+Resources:
+  # Rol para Lambda Scheduler Manager
+  SchedulerManagerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AcmeSchedulerManagerRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: SchedulerManagerPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Permisos para EventBridge Scheduler
+              - Effect: Allow
+                Action:
+                  - scheduler:CreateSchedule
+                  - scheduler:GetSchedule
+                  - scheduler:ListSchedules
+                  - scheduler:UpdateSchedule
+                  - scheduler:DeleteSchedule
+                  - scheduler:TagResource
+                Resource: '*'
+              
+              # Permisos para DynamoDB
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource:
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ScheduleDefinitionsTable'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ScheduleDefinitionsTable/index/*'
+              
+              # Permisos para KMS (cifrado DynamoDB)
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:Encrypt
+                  - kms:GenerateDataKey
+                  - kms:DescribeKey
+                Resource: '*'
+              
+              # Permisos para CloudWatch Logs
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+              
+              # Permisos para pasar rol a EventBridge Scheduler
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !GetAtt EventBridgeSchedulerRole.Arn
+
+  # Rol para Lambda Order Executor
+  OrderExecutorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AcmeOrderExecutorRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: OrderExecutorPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Permisos para DynamoDB
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/PurchaseOrdersTable'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/PurchaseOrdersTable/index/*'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ScheduleDefinitionsTable'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ScheduleDefinitionsTable/index/*'
+              
+              # Permisos para KMS
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:Encrypt
+                  - kms:GenerateDataKey
+                  - kms:DescribeKey
+                Resource: '*'
+              
+              # Permisos para CloudWatch Logs
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+
+  # Rol para EventBridge Scheduler invocar Lambda
+  EventBridgeSchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AcmeEventBridgeSchedulerRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:acme-order-executor'
+
+Outputs:
+  SchedulerManagerRoleArn:
+    Description: ARN del rol para Lambda Scheduler Manager
+    Value: !GetAtt SchedulerManagerRole.Arn
+    Export:
+      Name: AcmeSchedulerManagerRoleArn
+
+  OrderExecutorRoleArn:
+    Description: ARN del rol para Lambda Order Executor
+    Value: !GetAtt OrderExecutorRole.Arn
+    Export:
+      Name: AcmeOrderExecutorRoleArn
+
+  EventBridgeSchedulerRoleArn:
+    Description: ARN del rol para EventBridge Scheduler
+    Value: !GetAtt EventBridgeSchedulerRole.Arn
+    Export:
+      Name: AcmeEventBridgeSchedulerRoleArn

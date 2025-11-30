@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM Roles y Permisos para Cuenta SANDBOX - Célula 3 Acme Image Handler'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: acme-image-handler
+    Description: Nombre del proyecto
+  
+  BuildAccountId:
+    Type: String
+    Default: '372641111303'
+    Description: Account ID de la cuenta Build
+
+Resources:
+  # ==================== CROSS-ACCOUNT DEPLOYMENT ROLE ====================
+  
+  CrossAccountDeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-cross-account-role-sandbox'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${BuildAccountId}:root'
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Sub '${ProjectName}-deploy'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: sandbox
+
+  # ==================== LAMBDA EXECUTION ROLE ====================
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-lambda-role-sandbox'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: LambdaS3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource: '*'
+        
+        - PolicyName: LambdaDynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
+                Resource: '*'
+        
+        - PolicyName: LambdaKMSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                  - kms:DescribeKey
+                Resource: '*'
+        
+        - PolicyName: LambdaLogsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: sandbox
+
+  # ==================== API GATEWAY ROLE ====================
+  
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-apigateway-role-sandbox'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+      Policies:
+        - PolicyName: ApiGatewayLambdaInvoke
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: sandbox
+
+  # ==================== CLOUDFORMATION EXECUTION ROLE ====================
+  
+  CloudFormationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-cfn-role-sandbox'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${BuildAccountId}:root'
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: sandbox
+
+Outputs:
+  CrossAccountRoleArn:
+    Description: ARN del rol cross-account para despliegues
+    Value: !GetAtt CrossAccountDeploymentRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-cross-account-role-arn-sandbox'
+  
+  LambdaExecutionRoleArn:
+    Description: ARN del rol de ejecución de Lambda
+    Value: !GetAtt LambdaExecutionRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-lambda-role-arn-sandbox'
+  
+  ApiGatewayRoleArn:
+    Description: ARN del rol de API Gateway
+    Value: !GetAtt ApiGatewayRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-apigateway-role-arn-sandbox'
+  
+  CloudFormationExecutionRoleArn:
+    Description: ARN del rol de ejecución de CloudFormation
+    Value: !GetAtt CloudFormationExecutionRole.Arn
+    Export:
+      Name: !Sub '${ProjectName}-cfn-execution-role-arn-sandbox'

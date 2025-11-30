@@ -1,0 +1,82 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "preprod"
+  },
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "cartoon-rekognition"
+  },
+  {
+    "ParameterKey": "VpcCidr",
+    "ParameterValue": "10.1.0.0/16"
+  },
+  {
+    "ParameterKey": "LogRetentionDays",
+    "ParameterValue": "90"
+  },
+  {
+    "ParameterKey": "KMSStackName",
+    "ParameterValue": "cartoon-rekognition-kms-preprod"
+  },
+  {
+    "ParameterKey": "NetworkStackName",
+    "ParameterValue": "cartoon-rekognition-network-preprod"
+  },
+  {
+    "ParameterKey": "S3StackName",
+    "ParameterValue": "cartoon-rekognition-s3-preprod"
+  },
+  {
+    "ParameterKey": "DynamoDBStackName",
+    "ParameterValue": "cartoon-rekognition-dynamodb-preprod"
+  },
+  {
+    "ParameterKey": "CognitoStackName",
+    "ParameterValue": "cartoon-rekognition-cognito-preprod"
+  },
+  {
+    "ParameterKey": "LambdaStackName",
+    "ParameterValue": "cartoon-rekognition-lambda-preprod"
+  },
+  {
+    "ParameterKey": "EnableGSI",
+    "ParameterValue": "true"
+  },
+  {
+    "ParameterKey": "AccessTokenValidity",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "RefreshTokenValidity",
+    "ParameterValue": "30"
+  },
+  {
+    "ParameterKey": "PresignedUrlExpiration",
+    "ParameterValue": "300"
+  },
+  {
+    "ParameterKey": "ThrottleRateLimit",
+    "ParameterValue": "1000"
+  },
+  {
+    "ParameterKey": "ThrottleBurstLimit",
+    "ParameterValue": "2000"
+  },
+  {
+    "ParameterKey": "GitHubRepository",
+    "ParameterValue": "your-org/cartoon-rekognition"
+  },
+  {
+    "ParameterKey": "GitHubBranch",
+    "ParameterValue": "main"
+  },
+  {
+    "ParameterKey": "GitHubConnectionArn",
+    "ParameterValue": "arn:aws:codestar-connections:us-east-1:123456789012:connection/sample-connection-id"
+  },
+  {
+    "ParameterKey": "NotificationEmail",
+    "ParameterValue": "ops-team@example.com"
+  }
+]

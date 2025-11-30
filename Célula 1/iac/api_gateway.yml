@@ -1,0 +1,477 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'API Gateway REST API for Cartoon Rekognition - Secure endpoints with Cognito authorization, Lambda integrations, CORS, throttling, and access logging'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name (sandbox, preprod, prod)
+    AllowedValues:
+      - sandbox
+      - preprod
+      - prod
+    Default: sandbox
+
+  ProjectName:
+    Type: String
+    Description: Project name for resource naming
+    Default: cartoon-rekognition
+
+  CognitoStackName:
+    Type: String
+    Description: Name of the Cognito CloudFormation stack
+    Default: cartoon-rekognition-cognito
+
+  LambdaStackName:
+    Type: String
+    Description: Name of the Lambda CloudFormation stack
+    Default: cartoon-rekognition-lambda
+
+  KMSStackName:
+    Type: String
+    Description: Name of the KMS CloudFormation stack
+    Default: cartoon-rekognition-kms
+
+  ThrottleRateLimit:
+    Type: Number
+    Description: Steady-state request rate limit (requests per second)
+    Default: 1000
+    MinValue: 1
+    MaxValue: 10000
+
+  ThrottleBurstLimit:
+    Type: Number
+    Description: Burst request rate limit
+    Default: 2000
+    MinValue: 1
+    MaxValue: 20000
+
+  LogRetentionDays:
+    Type: Number
+    Description: Number of days to retain API Gateway access logs
+    Default: 90
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - Environment
+          - ProjectName
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - CognitoStackName
+          - LambdaStackName
+          - KMSStackName
+      - Label:
+          default: API Gateway Configuration
+        Parameters:
+          - ThrottleRateLimit
+          - ThrottleBurstLimit
+          - LogRetentionDays
+
+Resources:
+  # CloudWatch Log Group for API Gateway Access Logs
+  ApiGatewayAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/apigateway/${ProjectName}-api-${Environment}'
+      RetentionInDays: !Ref LogRetentionDays
+      KmsKeyId:
+        Fn::ImportValue: !Sub '${KMSStackName}-Logs-KeyArn'
+
+  # IAM Role for API Gateway to write to CloudWatch Logs
+  ApiGatewayCloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-api-gateway-cloudwatch-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-api-gateway-cloudwatch-role-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # REST API
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${ProjectName}-api-${Environment}'
+      Description: !Sub 'REST API for Cartoon Rekognition - ${Environment}'
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-api-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # Cognito Authorizer
+  CognitoAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: !Sub '${ProjectName}-cognito-authorizer-${Environment}'
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref RestApi
+      ProviderARNs:
+        - Fn::ImportValue: !Sub '${CognitoStackName}-UserPoolArn'
+
+  # Resource: /get-upload-url
+  GetUploadUrlResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: get-upload-url
+
+  # Method: GET /get-upload-url
+  GetUploadUrlMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref GetUploadUrlResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      RequestParameters:
+        method.request.querystring.filename: true
+        method.request.querystring.contentType: true
+      RequestValidatorId: !Ref RequestValidator
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations'
+          - LambdaArn:
+              Fn::ImportValue: !Sub '${LambdaStackName}-GeneratePresignedUrl-Arn'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: Empty
+        - StatusCode: 400
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+        - StatusCode: 401
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+        - StatusCode: 500
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # OPTIONS method for /get-upload-url (CORS)
+  GetUploadUrlOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref GetUploadUrlResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: Empty
+
+  # Resource: /result
+  ResultResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: result
+
+  # Method: GET /result
+  ResultMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ResultResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      RequestParameters:
+        method.request.querystring.imageId: true
+      RequestValidatorId: !Ref RequestValidator
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations'
+          - LambdaArn:
+              Fn::ImportValue: !Sub '${LambdaStackName}-QueryResults-Arn'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: Empty
+        - StatusCode: 400
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+        - StatusCode: 401
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+        - StatusCode: 404
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+        - StatusCode: 500
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # OPTIONS method for /result (CORS)
+  ResultOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ResultResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: Empty
+
+  # Resource: /register-analysis (optional)
+  RegisterAnalysisResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: register-analysis
+
+  # Method: POST /register-analysis
+  RegisterAnalysisMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref RegisterAnalysisResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: '{"message": "Not implemented yet"}'
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: Empty
+
+  # OPTIONS method for /register-analysis (CORS)
+  RegisterAnalysisOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref RegisterAnalysisResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          ResponseModels:
+            application/json: Empty
+
+  # Request Validator
+  RequestValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      Name: !Sub '${ProjectName}-request-validator-${Environment}'
+      RestApiId: !Ref RestApi
+      ValidateRequestParameters: true
+      ValidateRequestBody: false
+
+  # Lambda Permissions for API Gateway to invoke Lambda functions
+  GeneratePresignedUrlInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::ImportValue: !Sub '${LambdaStackName}-GeneratePresignedUrl-Name'
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*'
+
+  QueryResultsInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::ImportValue: !Sub '${LambdaStackName}-QueryResults-Name'
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*'
+
+  # API Gateway Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - GetUploadUrlMethod
+      - GetUploadUrlOptionsMethod
+      - ResultMethod
+      - ResultOptionsMethod
+      - RegisterAnalysisMethod
+      - RegisterAnalysisOptionsMethod
+    Properties:
+      RestApiId: !Ref RestApi
+      Description: !Sub 'Deployment for ${Environment} environment'
+
+  # API Gateway Stage
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: prod
+      RestApiId: !Ref RestApi
+      DeploymentId: !Ref ApiDeployment
+      Description: !Sub 'Production stage for ${Environment} environment'
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiGatewayAccessLogGroup.Arn
+        Format: '$context.requestId $context.extendedRequestId $context.identity.sourceIp $context.requestTime $context.httpMethod $context.routeKey $context.status $context.protocol $context.responseLength $context.error.message $context.error.messageString $context.authorizer.error'
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+          ThrottlingRateLimit: !Ref ThrottleRateLimit
+          ThrottlingBurstLimit: !Ref ThrottleBurstLimit
+      TracingEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-api-prod-stage-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+Outputs:
+  ApiId:
+    Description: ID of the REST API
+    Value: !Ref RestApi
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiId'
+
+  ApiEndpoint:
+    Description: Endpoint URL of the REST API
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiEndpoint'
+
+  ApiRootResourceId:
+    Description: Root resource ID of the REST API
+    Value: !GetAtt RestApi.RootResourceId
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiRootResourceId'
+
+  ApiStageName:
+    Description: Name of the API Gateway stage
+    Value: !Ref ApiStage
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiStageName'
+
+  GetUploadUrlEndpoint:
+    Description: Full endpoint URL for GET /get-upload-url
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/get-upload-url'
+    Export:
+      Name: !Sub '${AWS::StackName}-GetUploadUrlEndpoint'
+
+  ResultEndpoint:
+    Description: Full endpoint URL for GET /result
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/result'
+    Export:
+      Name: !Sub '${AWS::StackName}-ResultEndpoint'
+
+  RegisterAnalysisEndpoint:
+    Description: Full endpoint URL for POST /register-analysis
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/register-analysis'
+    Export:
+      Name: !Sub '${AWS::StackName}-RegisterAnalysisEndpoint'
+
+  ApiGatewayAccessLogGroupName:
+    Description: Name of the API Gateway access log group
+    Value: !Ref ApiGatewayAccessLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-AccessLogGroupName'
+
+  CognitoAuthorizerId:
+    Description: ID of the Cognito authorizer
+    Value: !Ref CognitoAuthorizer
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoAuthorizerId'

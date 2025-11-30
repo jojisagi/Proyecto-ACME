@@ -1,0 +1,60 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Lambda packages
+package/
+*.zip
+build/
+
+# Environment variables
+.env
+.env.local
+
+# AWS credentials (NUNCA commitear)
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Test data (imágenes generadas)
+data/test-images/*.jpg
+data/test-images/*.png
+data/test-images/*.gif
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# CloudFormation outputs
+outputs.json
+stack-outputs.json
+
+# Test files
+test-upload.jpg
+test-image.jpg

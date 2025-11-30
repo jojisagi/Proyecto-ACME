@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Célula 9 - Vehicle Gadgets Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Célula 9 - Vehicle Gadgets</h1>
+            <p>Gestión de Gadgets Tipo Vehículo - Acme Inc.</p>
+            <div id="auth-section">
+                <button id="login-btn" onclick="showLoginForm()">Iniciar Sesión</button>
+                <button id="logout-btn" style="display:none;" onclick="logout()">Cerrar Sesión</button>
+                <span id="user-info"></span>
+            </div>
+        </header>
+
+        <div id="login-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2>Iniciar Sesión</h2>
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Contraseña">
+                <button onclick="login()">Entrar</button>
+                <button onclick="hideLoginForm()">Cancelar</button>
+            </div>
+        </div>
+
+        <main id="main-content" style="display:none;">
+            <section class="actions">
+                <button onclick="showCreateForm()">➕ Crear Nuevo Gadget</button>
+                <button onclick="loadGadgets()">🔄 Recargar Lista</button>
+            </section>
+
+            <section id="create-form" style="display:none;">
+                <h2>Crear Nuevo Gadget</h2>
+                <form id="gadget-form">
+                    <input type="text" id="name" placeholder="Nombre" required>
+                    <input type="text" id="category" placeholder="Categoría" required>
+                    <input type="text" id="maxSpeed" placeholder="Velocidad Máxima" required>
+                    <input type="text" id="propulsionType" placeholder="Tipo de Propulsión" required>
+                    <input type="number" id="seats" placeholder="Asientos" required>
+                    <select id="status">
+                        <option value="Active">Activo</option>
+                        <option value="Prototype">Prototipo</option>
+                        <option value="Inactive">Inactivo</option>
+                    </select>
+                    <button type="submit">Guardar</button>
+                    <button type="button" onclick="hideCreateForm()">Cancelar</button>
+                </form>
+            </section>
+
+            <section class="gadgets-list">
+                <h2>Lista de Gadgets</h2>
+                <div id="gadgets-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+version: 0.2
+
+# BuildSpec para AWS CodeBuild - Sistema de Procesamiento de Toons
+# Runtime: Python 3.11
+# Responsabilidades: instalar deps, ejecutar tests, empaquetar Lambdas, validar IaC
+
+env:
+  variables:
+    PYTHON_VERSION: "3.11"
+    DIST_DIR: "dist"
+    LAMBDA_PACKAGE_DIR: "lambda_packages"
+  
+phases:
+  # ==================== INSTALL ====================
+  # Instalar herramientas y dependencias del sistema
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "=== Fase INSTALL iniciada ==="
+      - echo "Verificando versión de Python..."
+      - python --version
+      - pip --version
+      
+      # Actualizar pip y setuptools
+      - pip install --upgrade pip setuptools wheel
+      
+      # Instalar herramientas de testing
+      - pip install pytest pytest-cov pytest-mock boto3 moto
+      
+      - echo "=== Fase INSTALL completada ==="
+
+  # ==================== PRE_BUILD ====================
+  # Instalar dependencias de las Lambdas y ejecutar tests
+  pre_build:
+    commands:
+      - echo "=== Fase PRE_BUILD iniciada ==="
+      
+      # 1. Instalar dependencias de las Lambdas
+      - echo "Instalando dependencias de Python..."
+      - |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt -t ./python_modules
+          echo "Dependencias instaladas desde requirements.txt"
+        else
+          echo "ADVERTENCIA: No se encontró requirements.txt"
+        fi
+      
+      # 2. Ejecutar linter (opcional pero recomendado)
+      - echo "Ejecutando validación de código..."
+      - pip install flake8
+      - flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics || true
+      
+      # 3. Ejecutar tests unitarios
+      - echo "Ejecutando tests unitarios..."
+      - |
+        if [ -d tests/ ]; then
+          pytest tests/ -v --cov=src --cov-report=term --cov-report=html || {
+            echo "ERROR: Tests fallaron"
+            exit 1
+          }
+          echo "Tests ejecutados exitosamente"
+        else
+          echo "ADVERTENCIA: No se encontró carpeta tests/"
+        fi
+      
+      # 4. Validar plantillas de CloudFormation
+      - echo "Validando plantillas de CloudFormation..."
+      - |
+        for template in iac/*.yaml iac/*.yml iac/templates/*.yaml iac/templates/*.yml; do
+          if [ -f "$template" ]; then
+            echo "Validando: $template"
+            aws cloudformation validate-template --template-body file://$template || {
+              echo "ERROR: Validación falló para $template"
+              exit 1
+            }
+          fi
+        done
+        echo "Todas las plantillas CloudFormation son válidas"
+      
+      - echo "=== Fase PRE_BUILD completada ==="
+
+  # ==================== BUILD ====================
+  # Empaquetar Lambdas en archivos .zip
+  build:
+    commands:
+      - echo "=== Fase BUILD iniciada ==="
+      
+      # Crear directorios de salida
+      - mkdir -p $DIST_DIR
+      - mkdir -p $LAMBDA_PACKAGE_DIR
+      
+      # Función helper para empaquetar Lambdas
+      - echo "Empaquetando funciones Lambda..."
+      
+      # 1. Empaquetar Lambda SubmitJob
+      - echo "Empaquetando SubmitJob..."
+      - |
+        cd src/lambdas/submit_job
+        zip -r ../../../$DIST_DIR/submit_job.zip . -x "*.pyc" -x "*__pycache__*" -x "*.git*"
+        # Agregar dependencias compartidas
+        cd ../../../
+        if [ -d python_modules ]; then
+          cd python_modules
+          zip -r ../$DIST_DIR/submit_job.zip . -x "*.pyc" -x "*__pycache__*"
+          cd ..
+        fi
+        # Agregar módulos compartidos (business_logic, utils)
+        cd src
+        zip -r ../$DIST_DIR/submit_job.zip business_logic/ utils/ -x "*.pyc" -x "*__pycache__*"
+        cd ..
+        echo "SubmitJob empaquetado: $DIST_DIR/submit_job.zip"
+      
+      # 2. Empaquetar Lambda Worker
+      - echo "Empaquetando Worker..."
+      - |
+        cd src/lambdas/worker
+        zip -r ../../../$DIST_DIR/worker.zip . -x "*.pyc" -x "*__pycache__*" -x "*.git*"
+        cd ../../../
+        if [ -d python_modules ]; then
+          cd python_modules
+          zip -r ../$DIST_DIR/worker.zip . -x "*.pyc" -x "*__pycache__*"
+          cd ..
+        fi
+        cd src
+        zip -r ../$DIST_DIR/worker.zip business_logic/ utils/ -x "*.pyc" -x "*__pycache__*"
+        cd ..
+        echo "Worker empaquetado: $DIST_DIR/worker.zip"
+      
+      # 3. Empaquetar Lambda GetJobStatus
+      - echo "Empaquetando GetJobStatus..."
+      - |
+        cd src/lambdas/get_job_status
+        zip -r ../../../$DIST_DIR/get_job_status.zip . -x "*.pyc" -x "*__pycache__*" -x "*.git*"
+        cd ../../../
+        if [ -d python_modules ]; then
+          cd python_modules
+          zip -r ../$DIST_DIR/get_job_status.zip . -x "*.pyc" -x "*__pycache__*"
+          cd ..
+        fi
+        cd src
+        zip -r ../$DIST_DIR/get_job_status.zip business_logic/ utils/ -x "*.pyc" -x "*__pycache__*"
+        cd ..
+        echo "GetJobStatus empaquetado: $DIST_DIR/get_job_status.zip"
+      
+      # 4. Empaquetar Lambda GetResults
+      - echo "Empaquetando GetResults..."
+      - |
+        cd src/lambdas/get_results
+        zip -r ../../../$DIST_DIR/get_results.zip . -x "*.pyc" -x "*__pycache__*" -x "*.git*"
+        cd ../../../
+        if [ -d python_modules ]; then
+          cd python_modules
+          zip -r ../$DIST_DIR/get_results.zip . -x "*.pyc" -x "*__pycache__*"
+          cd ..
+        fi
+        cd src
+        zip -r ../$DIST_DIR/get_results.zip business_logic/ utils/ -x "*.pyc" -x "*__pycache__*"
+        cd ..
+        echo "GetResults empaquetado: $DIST_DIR/get_results.zip"
+      
+      # Verificar tamaños de los paquetes
+      - echo "Verificando tamaños de paquetes Lambda..."
+      - ls -lh $DIST_DIR/*.zip
+      
+      # Copiar plantillas de CloudFormation al directorio de distribución
+      - echo "Copiando plantillas de CloudFormation..."
+      - cp -r iac/ $DIST_DIR/
+      
+      # Copiar datos de prueba (opcional, para despliegues de dev)
+      - echo "Copiando datos de prueba..."
+      - cp -r data/ $DIST_DIR/ || echo "No se encontró carpeta data/"
+      
+      - echo "=== Fase BUILD completada ==="
+
+  # ==================== POST_BUILD ====================
+  # Generar reportes y preparar artefactos finales
+  post_build:
+    commands:
+      - echo "=== Fase POST_BUILD iniciada ==="
+      
+      # Generar manifiesto de build
+      - echo "Generando manifiesto de build..."
+      - |
+        cat > $DIST_DIR/build-manifest.json <<EOF
+        {
+          "buildId": "$CODEBUILD_BUILD_ID",
+          "buildNumber": "$CODEBUILD_BUILD_NUMBER",
+          "sourceVersion": "$CODEBUILD_RESOLVED_SOURCE_VERSION",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "artifacts": {
+            "lambdas": [
+              "submit_job.zip",
+              "worker.zip",
+              "get_job_status.zip",
+              "get_results.zip"
+            ],
+            "infrastructure": "iac/",
+            "testData": "data/"
+          }
+        }
+        EOF
+      
+      # Mostrar resumen del build
+      - echo "=== RESUMEN DEL BUILD ==="
+      - echo "Build ID: $CODEBUILD_BUILD_ID"
+      - echo "Commit: $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - echo "Branch: $CODEBUILD_WEBHOOK_HEAD_REF"
+      - echo "Artefactos generados:"
+      - ls -lh $DIST_DIR/
+      
+      # Verificar que todos los artefactos críticos existen
+      - |
+        REQUIRED_ARTIFACTS=(
+          "$DIST_DIR/submit_job.zip"
+          "$DIST_DIR/worker.zip"
+          "$DIST_DIR/get_job_status.zip"
+          "$DIST_DIR/get_results.zip"
+        )
+        
+        for artifact in "${REQUIRED_ARTIFACTS[@]}"; do
+          if [ ! -f "$artifact" ]; then
+            echo "ERROR: Artefacto requerido no encontrado: $artifact"
+            exit 1
+          fi
+        done
+        echo "Todos los artefactos requeridos están presentes"
+      
+      - echo "=== Fase POST_BUILD completada ==="
+      - echo "Build exitoso!"
+
+# ==================== ARTIFACTS ====================
+# Definir qué archivos se suben como artefactos del build
+artifacts:
+  files:
+    - '**/*'
+  base-directory: $DIST_DIR
+  name: toon-processor-artifacts-$(date +%Y%m%d-%H%M%S)
+  discard-paths: no
+
+# ==================== CACHE ====================
+# Cachear dependencias de Python para builds más rápidos
+cache:
+  paths:
+    - '/root/.cache/pip/**/*'
+    - 'python_modules/**/*'
+
+# ==================== REPORTS ====================
+# Reportes de tests y cobertura (opcional)
+reports:
+  pytest_reports:
+    files:
+      - 'htmlcov/**/*'
+    file-format: 'HTML'
+  coverage_report:
+    files:
+      - '.coverage'
+    file-format: 'COBERTURAXML'

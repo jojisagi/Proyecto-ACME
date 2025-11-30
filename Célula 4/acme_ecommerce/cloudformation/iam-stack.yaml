@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'IAM Roles and Policies for E-commerce Application'
+
+Resources:
+  # Lambda Execution Role para App Server
+  AppServerLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecommerce-app-server-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: AppServerPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Orders'
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:order-processing-queue'
+
+  # Lambda Execution Role para Process Order
+  ProcessOrderLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecommerce-process-order-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ProcessOrderPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:UpdateItem
+                  - dynamodb:GetItem
+                Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Orders'
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:order-notifications'
+
+  # Step Functions Execution Role
+  StepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecommerce-step-functions-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:process-order'
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:order-processing-queue'
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:order-notifications'
+
+  # API Gateway CloudWatch Role
+  ApiGatewayCloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecommerce-api-gateway-cloudwatch-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+Outputs:
+  AppServerLambdaRoleArn:
+    Description: ARN of App Server Lambda Role
+    Value: !GetAtt AppServerLambdaRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-AppServerLambdaRoleArn'
+
+  ProcessOrderLambdaRoleArn:
+    Description: ARN of Process Order Lambda Role
+    Value: !GetAtt ProcessOrderLambdaRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-ProcessOrderLambdaRoleArn'
+
+  StepFunctionsRoleArn:
+    Description: ARN of Step Functions Role
+    Value: !GetAtt StepFunctionsRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-StepFunctionsRoleArn'
+
+  ApiGatewayCloudWatchRoleArn:
+    Description: ARN of API Gateway CloudWatch Role
+    Value: !GetAtt ApiGatewayCloudWatchRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiGatewayCloudWatchRoleArn'

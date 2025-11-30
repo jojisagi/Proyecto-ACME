@@ -1,0 +1,11 @@
+HU-5.1 – Subir screenshot
+
+Como jugador
+Quiero enviar mis capturas
+Para analizar mi desempeño.
+
+HU-5.2 – Obtener historial de capturas
+
+Como jugador autenticado
+Quiero ver todas mis screenshots procesadas
+Para estudiar mi progreso.

@@ -1,0 +1,17 @@
+HU-4.1 – Consultar catálogo de gadgets
+
+Como comprador autenticado
+Quiero ver todos los productos disponibles
+Para tomar decisiones de compra.
+
+HU-4.2 – Crear orden de compra
+
+Como usuario autenticado
+Quiero generar una orden
+Para completar mi compra en Acme.
+
+HU-4.3 – Integrar imágenes de la Célula 3
+
+Como microservicio de productos
+Quiero obtener la imagen procesada del gadget
+Para mostrarla en el catálogo.

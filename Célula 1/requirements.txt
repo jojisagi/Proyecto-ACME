@@ -1,0 +1,16 @@
+# AWS SDK
+boto3>=1.34.0
+
+# Testing frameworks
+pytest>=7.4.0
+pytest-cov>=4.1.0
+hypothesis>=6.92.0
+
+# CloudFormation tools
+cfn-lint>=0.83.0
+
+# Mocking for tests
+moto>=4.2.0
+
+# Additional utilities
+python-dateutil>=2.8.2

@@ -1,0 +1,541 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Lambda Functions for Cartoon Rekognition - GeneratePresignedUrl, S3EventProcessor, QueryResults with IAM roles, VPC config, and CloudWatch Logs'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name (sandbox, preprod, prod)
+    AllowedValues:
+      - sandbox
+      - preprod
+      - prod
+    Default: sandbox
+
+  ProjectName:
+    Type: String
+    Description: Project name for resource naming
+    Default: cartoon-rekognition
+
+  NetworkStackName:
+    Type: String
+    Description: Name of the Network CloudFormation stack
+    Default: cartoon-rekognition-network
+
+  KMSStackName:
+    Type: String
+    Description: Name of the KMS CloudFormation stack
+    Default: cartoon-rekognition-kms
+
+  S3StackName:
+    Type: String
+    Description: Name of the S3 CloudFormation stack
+    Default: cartoon-rekognition-s3
+
+  DynamoDBStackName:
+    Type: String
+    Description: Name of the DynamoDB CloudFormation stack
+    Default: cartoon-rekognition-dynamodb
+
+  PresignedUrlExpiration:
+    Type: Number
+    Description: Presigned URL expiration time in seconds
+    Default: 300
+    MinValue: 60
+    MaxValue: 3600
+
+  LogRetentionDays:
+    Type: Number
+    Description: Number of days to retain Lambda logs
+    Default: 90
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - Environment
+          - ProjectName
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - NetworkStackName
+          - KMSStackName
+          - S3StackName
+          - DynamoDBStackName
+      - Label:
+          default: Lambda Configuration
+        Parameters:
+          - PresignedUrlExpiration
+          - LogRetentionDays
+
+Resources:
+  # Dead Letter Queue for S3EventProcessor
+  S3EventProcessorDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${ProjectName}-s3-event-processor-dlq-${Environment}'
+      MessageRetentionPeriod: 1209600  # 14 days
+      KmsMasterKeyId:
+        Fn::ImportValue: !Sub '${KMSStackName}-S3-KeyId'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-s3-event-processor-dlq-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # IAM Role for GeneratePresignedUrl Lambda
+  GeneratePresignedUrlRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-generate-presigned-url-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+      Policies:
+        - PolicyName: S3PresignedUrlPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowS3PutObject
+                Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                  - 's3:PutObjectAcl'
+                Resource:
+                  - Fn::Sub:
+                      - '${BucketArn}/*'
+                      - BucketArn:
+                          Fn::ImportValue: !Sub '${S3StackName}-ImagesBucketArn'
+              - Sid: AllowKMSForS3
+                Effect: Allow
+                Action:
+                  - 'kms:Decrypt'
+                  - 'kms:GenerateDataKey'
+                Resource:
+                  Fn::ImportValue: !Sub '${KMSStackName}-S3-KeyArn'
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-generate-presigned-url-${Environment}:*'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-generate-presigned-url-role-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # IAM Role for S3EventProcessor Lambda
+  S3EventProcessorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-s3-event-processor-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+      Policies:
+        - PolicyName: S3ReadPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowS3GetObject
+                Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                  - 's3:HeadObject'
+                Resource:
+                  - Fn::Sub:
+                      - '${BucketArn}/*'
+                      - BucketArn:
+                          Fn::ImportValue: !Sub '${S3StackName}-ImagesBucketArn'
+        - PolicyName: RekognitionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowRekognitionDetectLabels
+                Effect: Allow
+                Action:
+                  - 'rekognition:DetectLabels'
+                  - 'rekognition:DetectFaces'
+                Resource: '*'
+        - PolicyName: DynamoDBWritePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowDynamoDBPutItem
+                Effect: Allow
+                Action:
+                  - 'dynamodb:PutItem'
+                Resource:
+                  Fn::ImportValue: !Sub '${DynamoDBStackName}-TableArn'
+        - PolicyName: KMSDecryptPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowKMSDecrypt
+                Effect: Allow
+                Action:
+                  - 'kms:Decrypt'
+                  - 'kms:DescribeKey'
+                Resource:
+                  - Fn::ImportValue: !Sub '${KMSStackName}-S3-KeyArn'
+                  - Fn::ImportValue: !Sub '${KMSStackName}-DynamoDB-KeyArn'
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-s3-event-processor-${Environment}:*'
+        - PolicyName: SQSDLQPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowSQSSendMessage
+                Effect: Allow
+                Action:
+                  - 'sqs:SendMessage'
+                Resource: !GetAtt S3EventProcessorDLQ.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-s3-event-processor-role-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # IAM Role for QueryResults Lambda
+  QueryResultsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-query-results-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+      Policies:
+        - PolicyName: DynamoDBReadPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowDynamoDBGetItem
+                Effect: Allow
+                Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Query'
+                Resource:
+                  - Fn::ImportValue: !Sub '${DynamoDBStackName}-TableArn'
+                  - Fn::Sub:
+                      - '${TableArn}/index/*'
+                      - TableArn:
+                          Fn::ImportValue: !Sub '${DynamoDBStackName}-TableArn'
+        - PolicyName: KMSDecryptPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowKMSDecrypt
+                Effect: Allow
+                Action:
+                  - 'kms:Decrypt'
+                  - 'kms:DescribeKey'
+                Resource:
+                  Fn::ImportValue: !Sub '${KMSStackName}-DynamoDB-KeyArn'
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-query-results-${Environment}:*'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-query-results-role-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # CloudWatch Log Group for GeneratePresignedUrl Lambda
+  GeneratePresignedUrlLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ProjectName}-generate-presigned-url-${Environment}'
+      RetentionInDays: !Ref LogRetentionDays
+      KmsKeyId:
+        Fn::ImportValue: !Sub '${KMSStackName}-Logs-KeyArn'
+
+  # CloudWatch Log Group for S3EventProcessor Lambda
+  S3EventProcessorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ProjectName}-s3-event-processor-${Environment}'
+      RetentionInDays: !Ref LogRetentionDays
+      KmsKeyId:
+        Fn::ImportValue: !Sub '${KMSStackName}-Logs-KeyArn'
+
+  # CloudWatch Log Group for QueryResults Lambda
+  QueryResultsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ProjectName}-query-results-${Environment}'
+      RetentionInDays: !Ref LogRetentionDays
+      KmsKeyId:
+        Fn::ImportValue: !Sub '${KMSStackName}-Logs-KeyArn'
+
+  # Lambda Function: GeneratePresignedUrl
+  GeneratePresignedUrlFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: GeneratePresignedUrlLogGroup
+    Properties:
+      FunctionName: !Sub '${ProjectName}-generate-presigned-url-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt GeneratePresignedUrlRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'Placeholder - Deploy actual code'})
+              }
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Fn::ImportValue: !Sub '${S3StackName}-ImagesBucketName'
+          EXPIRATION_SECONDS: !Ref PresignedUrlExpiration
+      VpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue: !Sub '${NetworkStackName}-LambdaSecurityGroupId'
+        SubnetIds:
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet1Id'
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet2Id'
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet3Id'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-generate-presigned-url-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # Lambda Function: S3EventProcessor
+  S3EventProcessorFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: S3EventProcessorLogGroup
+    Properties:
+      FunctionName: !Sub '${ProjectName}-s3-event-processor-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt S3EventProcessorRole.Arn
+      Timeout: 300
+      MemorySize: 512
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'Placeholder - Deploy actual code'})
+              }
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Fn::ImportValue: !Sub '${DynamoDBStackName}-TableName'
+      VpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue: !Sub '${NetworkStackName}-LambdaSecurityGroupId'
+        SubnetIds:
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet1Id'
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet2Id'
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet3Id'
+      DeadLetterConfig:
+        TargetArn: !GetAtt S3EventProcessorDLQ.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-s3-event-processor-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # Lambda Function: QueryResults
+  QueryResultsFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: QueryResultsLogGroup
+    Properties:
+      FunctionName: !Sub '${ProjectName}-query-results-${Environment}'
+      Runtime: python3.11
+      Handler: handler.lambda_handler
+      Role: !GetAtt QueryResultsRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'Placeholder - Deploy actual code'})
+              }
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Fn::ImportValue: !Sub '${DynamoDBStackName}-TableName'
+      VpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue: !Sub '${NetworkStackName}-LambdaSecurityGroupId'
+        SubnetIds:
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet1Id'
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet2Id'
+          - Fn::ImportValue: !Sub '${NetworkStackName}-PrivateSubnet3Id'
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-query-results-${Environment}'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # Lambda Permission for S3 to invoke S3EventProcessor
+  S3EventProcessorInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref S3EventProcessorFunction
+      Action: 'lambda:InvokeFunction'
+      Principal: s3.amazonaws.com
+      SourceArn:
+        Fn::ImportValue: !Sub '${S3StackName}-ImagesBucketArn'
+      SourceAccount: !Ref AWS::AccountId
+
+Outputs:
+  # GeneratePresignedUrl Outputs
+  GeneratePresignedUrlFunctionArn:
+    Description: ARN of the GeneratePresignedUrl Lambda function
+    Value: !GetAtt GeneratePresignedUrlFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-GeneratePresignedUrl-Arn'
+
+  GeneratePresignedUrlFunctionName:
+    Description: Name of the GeneratePresignedUrl Lambda function
+    Value: !Ref GeneratePresignedUrlFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-GeneratePresignedUrl-Name'
+
+  GeneratePresignedUrlRoleArn:
+    Description: ARN of the GeneratePresignedUrl Lambda role
+    Value: !GetAtt GeneratePresignedUrlRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-GeneratePresignedUrl-RoleArn'
+
+  # S3EventProcessor Outputs
+  S3EventProcessorFunctionArn:
+    Description: ARN of the S3EventProcessor Lambda function
+    Value: !GetAtt S3EventProcessorFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-S3EventProcessor-Arn'
+
+  S3EventProcessorFunctionName:
+    Description: Name of the S3EventProcessor Lambda function
+    Value: !Ref S3EventProcessorFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-S3EventProcessor-Name'
+
+  S3EventProcessorRoleArn:
+    Description: ARN of the S3EventProcessor Lambda role
+    Value: !GetAtt S3EventProcessorRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-S3EventProcessor-RoleArn'
+
+  # QueryResults Outputs
+  QueryResultsFunctionArn:
+    Description: ARN of the QueryResults Lambda function
+    Value: !GetAtt QueryResultsFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-QueryResults-Arn'
+
+  QueryResultsFunctionName:
+    Description: Name of the QueryResults Lambda function
+    Value: !Ref QueryResultsFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-QueryResults-Name'
+
+  QueryResultsRoleArn:
+    Description: ARN of the QueryResults Lambda role
+    Value: !GetAtt QueryResultsRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-QueryResults-RoleArn'
+
+  # DLQ Output
+  S3EventProcessorDLQArn:
+    Description: ARN of the S3EventProcessor Dead Letter Queue
+    Value: !GetAtt S3EventProcessorDLQ.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-S3EventProcessor-DLQ-Arn'
+
+  S3EventProcessorDLQUrl:
+    Description: URL of the S3EventProcessor Dead Letter Queue
+    Value: !Ref S3EventProcessorDLQ
+    Export:
+      Name: !Sub '${AWS::StackName}-S3EventProcessor-DLQ-Url'
+
+  # Log Groups Outputs
+  GeneratePresignedUrlLogGroupName:
+    Description: Name of the GeneratePresignedUrl CloudWatch Log Group
+    Value: !Ref GeneratePresignedUrlLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-GeneratePresignedUrl-LogGroup'
+
+  S3EventProcessorLogGroupName:
+    Description: Name of the S3EventProcessor CloudWatch Log Group
+    Value: !Ref S3EventProcessorLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-S3EventProcessor-LogGroup'
+
+  QueryResultsLogGroupName:
+    Description: Name of the QueryResults CloudWatch Log Group
+    Value: !Ref QueryResultsLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-QueryResults-LogGroup'

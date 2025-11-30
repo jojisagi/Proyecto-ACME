@@ -1,0 +1,216 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cognito User Pool for Cartoon Rekognition - User authentication with secure password policies, JWT tokens, and custom domain'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name (sandbox, preprod, prod)
+    AllowedValues:
+      - sandbox
+      - preprod
+      - prod
+    Default: sandbox
+
+  ProjectName:
+    Type: String
+    Description: Project name for resource naming
+    Default: cartoon-rekognition
+
+  AccessTokenValidity:
+    Type: Number
+    Description: Access token validity in hours
+    Default: 1
+    MinValue: 1
+    MaxValue: 24
+
+  RefreshTokenValidity:
+    Type: Number
+    Description: Refresh token validity in days
+    Default: 30
+    MinValue: 1
+    MaxValue: 3650
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - Environment
+          - ProjectName
+      - Label:
+          default: Token Configuration
+        Parameters:
+          - AccessTokenValidity
+          - RefreshTokenValidity
+
+Resources:
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${ProjectName}-user-pool-${Environment}'
+      
+      # Password Policy - Secure configuration
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          TemporaryPasswordValidityDays: 7
+      
+      # User Attributes
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+      
+      # Email Configuration
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      
+      # Email Verification Message
+      EmailVerificationMessage: 'Your verification code for Cartoon Rekognition is {####}'
+      EmailVerificationSubject: 'Cartoon Rekognition - Verify your email'
+      
+      # Account Recovery
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      
+      # User Pool Add-ons
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
+      
+      # MFA Configuration (optional, can be enforced)
+      MfaConfiguration: OPTIONAL
+      EnabledMfas:
+        - SOFTWARE_TOKEN_MFA
+      
+      # Admin Create User Configuration
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+        InviteMessageTemplate:
+          EmailMessage: 'Welcome to Cartoon Rekognition! Your username is {username} and temporary password is {####}'
+          EmailSubject: 'Welcome to Cartoon Rekognition'
+      
+      # User Pool Tags
+      UserPoolTags:
+        Name: !Sub '${ProjectName}-user-pool-${Environment}'
+        Environment: !Ref Environment
+        Project: !Ref ProjectName
+        Purpose: User Authentication
+
+  # Cognito User Pool Domain
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub '${ProjectName}-${Environment}-${AWS::AccountId}'
+      UserPoolId: !Ref UserPool
+
+  # Cognito User Pool Client (App Client)
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${ProjectName}-app-client-${Environment}'
+      UserPoolId: !Ref UserPool
+      
+      # No client secret for public clients (mobile/web apps)
+      GenerateSecret: false
+      
+      # Token Validity Configuration
+      AccessTokenValidity: !Ref AccessTokenValidity
+      IdTokenValidity: !Ref AccessTokenValidity
+      RefreshTokenValidity: !Ref RefreshTokenValidity
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      
+      # OAuth Configuration
+      AllowedOAuthFlows:
+        - implicit
+        - code
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      AllowedOAuthFlowsUserPoolClient: true
+      
+      # Supported Identity Providers
+      SupportedIdentityProviders:
+        - COGNITO
+      
+      # Callback URLs (placeholder - should be updated with actual API Gateway URL)
+      CallbackURLs:
+        - !Sub 'https://${ProjectName}-${Environment}.example.com/callback'
+      LogoutURLs:
+        - !Sub 'https://${ProjectName}-${Environment}.example.com/logout'
+      
+      # Prevent user existence errors
+      PreventUserExistenceErrors: ENABLED
+      
+      # Read and Write Attributes
+      ReadAttributes:
+        - email
+        - email_verified
+      WriteAttributes:
+        - email
+      
+      # Enable token revocation
+      EnableTokenRevocation: true
+      
+      # Explicit Auth Flows
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+
+Outputs:
+  UserPoolId:
+    Description: ID of the Cognito User Pool
+    Value: !Ref UserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolId'
+
+  UserPoolArn:
+    Description: ARN of the Cognito User Pool
+    Value: !GetAtt UserPool.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolArn'
+
+  AppClientId:
+    Description: ID of the Cognito User Pool App Client
+    Value: !Ref UserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-AppClientId'
+
+  UserPoolDomain:
+    Description: Domain of the Cognito User Pool
+    Value: !Ref UserPoolDomain
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolDomain'
+
+  UserPoolDomainUrl:
+    Description: Full URL of the Cognito User Pool Domain
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com'
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolDomainUrl'
+
+  UserPoolProviderName:
+    Description: Provider name for API Gateway authorizer
+    Value: !GetAtt UserPool.ProviderName
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolProviderName'
+
+  UserPoolProviderURL:
+    Description: Provider URL for API Gateway authorizer
+    Value: !GetAtt UserPool.ProviderURL
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolProviderURL'

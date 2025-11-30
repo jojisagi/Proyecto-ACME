@@ -1,0 +1,11 @@
+HU-1.1 – Subir imagen para análisis
+
+Como artista de Acme
+Quiero subir una imagen mediante una API
+Para identificar qué personaje aparece.
+
+HU-1.2 – Consultar resultado del análisis
+
+Como artista
+Quiero consultar qué personaje detectó el sistema
+Para organizar mis bocetos.

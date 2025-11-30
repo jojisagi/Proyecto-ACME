@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+  
+  build:
+    commands:
+      - echo "Iniciando validación de la infraestructura..."
+      # Valida que la plantilla de CloudFormation no tenga errores de sintaxis
+      - aws cloudformation validate-template --template-body file://iac/template.yaml
+  
+  post_build:
+    commands:
+      - echo "Empaquetado completado el `date`"
+
+artifacts:
+  # Estos son los archivos que AWS guardará para el despliegue
+  files:
+    - iac/template.yaml
+    - src/**/*
+    - frontend/**/*
+    - data/**/*
+    - scripts/**/*
+  discard-paths: no

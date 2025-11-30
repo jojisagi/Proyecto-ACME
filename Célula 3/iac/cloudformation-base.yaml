@@ -1,0 +1,606 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Acme Image Handler - Serverless Architecture Complete - Célula 3'
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: sandbox
+    AllowedValues: [sandbox, pre-prod, prod]
+    Description: Ambiente de despliegue
+  
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID para las Lambdas
+  
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Primera subred privada
+  
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Segunda subred privada
+  
+  CognitoUserPoolId:
+    Type: String
+    Description: ID del User Pool de Cognito (opcional, se crea si está vacío)
+    Default: ''
+  
+  ProjectName:
+    Type: String
+    Default: acme-image-handler
+    Description: Nombre del proyecto
+
+Resources:
+  # ==================== KMS KEY ====================
+  
+  EncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub 'KMS key para ${ProjectName} - ${EnvironmentName}'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow services to use the key
+            Effect: Allow
+            Principal:
+              Service:
+                - s3.amazonaws.com
+                - dynamodb.amazonaws.com
+                - lambda.amazonaws.com
+                - logs.amazonaws.com
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+            Resource: '*'
+  
+  EncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-${EnvironmentName}'
+      TargetKeyId: !Ref EncryptionKey
+
+  # ==================== S3 BUCKETS ====================
+  
+  RawImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'acme-gadgets-raw-${AWS::AccountId}-${EnvironmentName}'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref EncryptionKey
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 30
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+
+  ProcessedImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'acme-gadgets-processed-${AWS::AccountId}-${EnvironmentName}'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref EncryptionKey
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET, HEAD]
+            AllowedOrigins: ['*']
+            MaxAge: 3000
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # ==================== DYNAMODB ====================
+  
+  GadgetImagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'GadgetImages-${EnvironmentName}'
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        Enabled: true
+        SSEType: KMS
+        KMSMasterKeyId: !Ref EncryptionKey
+      AttributeDefinitions:
+        - AttributeName: gadgetId
+          AttributeType: S
+        - AttributeName: imageId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gadgetId
+          KeyType: HASH
+        - AttributeName: imageId
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+  
+  # ==================== COGNITO ====================
+  
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${ProjectName}-users-${EnvironmentName}'
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      MfaConfiguration: OPTIONAL
+      UserPoolTags:
+        Environment: !Ref EnvironmentName
+        Project: !Ref ProjectName
+  
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${ProjectName}-client-${EnvironmentName}'
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+      PreventUserExistenceErrors: ENABLED
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+  
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub '${ProjectName}-${EnvironmentName}-${AWS::AccountId}'
+      UserPoolId: !Ref UserPool
+
+  # ==================== IAM ROLES ====================
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-lambda-role-${EnvironmentName}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                Resource:
+                  - !GetAtt RawImagesBucket.Arn
+                  - !Sub '${RawImagesBucket.Arn}/*'
+                  - !GetAtt ProcessedImagesBucket.Arn
+                  - !Sub '${ProcessedImagesBucket.Arn}/*'
+        
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource: 
+                  - !GetAtt GadgetImagesTable.Arn
+                  - !Sub '${GadgetImagesTable.Arn}/index/*'
+        
+        - PolicyName: KMSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                  - kms:DescribeKey
+                Resource: !GetAtt EncryptionKey.Arn
+        
+        - PolicyName: LogsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+  
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-apigateway-role-${EnvironmentName}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+  # ==================== LAMBDA FUNCTIONS ====================
+  
+  ImageProcessorLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-processor-${EnvironmentName}'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      MemorySize: 1024
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROCESSED_BUCKET: !Ref ProcessedImagesBucket
+          DYNAMODB_TABLE: !Ref GadgetImagesTable
+          ENVIRONMENT: !Ref EnvironmentName
+          KMS_KEY_ID: !Ref EncryptionKey
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': json.dumps('Placeholder - Deploy via CI/CD')}
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+
+  ApiHandlerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-api-${EnvironmentName}'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROCESSED_BUCKET: !Ref ProcessedImagesBucket
+          RAW_BUCKET: !Ref RawImagesBucket
+          DYNAMODB_TABLE: !Ref GadgetImagesTable
+          ENVIRONMENT: !Ref EnvironmentName
+          KMS_KEY_ID: !Ref EncryptionKey
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': json.dumps('Placeholder - Deploy via CI/CD')}
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+
+  # S3 Trigger para procesador de imágenes
+  S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ImageProcessorLambda
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt RawImagesBucket.Arn
+  
+  # Lambda Logs
+  ImageProcessorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ImageProcessorLambda}'
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt EncryptionKey.Arn
+  
+  ApiHandlerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ApiHandlerLambda}'
+      RetentionInDays: 30
+      KmsKeyId: !GetAtt EncryptionKey.Arn
+
+  # ==================== SECURITY GROUP ====================
+  
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'Security group para Lambdas - ${ProjectName}'
+      VpcId: !Ref VPCId
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS saliente para AWS services
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-lambda-sg-${EnvironmentName}'
+        - Key: Environment
+          Value: !Ref EnvironmentName
+  
+  # ==================== API GATEWAY ====================
+  
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${ProjectName}-api-${EnvironmentName}'
+      Description: API para gestión de imágenes de gadgets
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+  
+  CognitoAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref RestApi
+      ProviderARNs:
+        - !GetAtt UserPool.Arn
+  
+  # Resource: /images
+  ImagesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: images
+  
+  # GET /images
+  ImagesGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ImagesResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerLambda.Arn}/invocations'
+  
+  # Resource: /upload-url
+  UploadUrlResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: upload-url
+  
+  # POST /upload-url
+  UploadUrlPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref UploadUrlResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerLambda.Arn}/invocations'
+  
+  # Resource: /images/{imageId}
+  ImageResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !Ref ImagesResource
+      PathPart: '{imageId}'
+  
+  # GET /images/{imageId}
+  ImageGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ImageResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref CognitoAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlerLambda.Arn}/invocations'
+  
+  # Lambda permissions for API Gateway
+  ApiGatewayInvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiHandlerLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*'
+  
+  # API Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ImagesGetMethod
+      - UploadUrlPostMethod
+      - ImageGetMethod
+    Properties:
+      RestApiId: !Ref RestApi
+      Description: !Sub 'Deployment ${EnvironmentName}'
+  
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref RestApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: !Ref EnvironmentName
+      Description: !Sub 'Stage ${EnvironmentName}'
+      TracingEnabled: true
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Project
+          Value: !Ref ProjectName
+
+Outputs:
+  KMSKeyId:
+    Value: !Ref EncryptionKey
+    Description: ID de la KMS Key
+    Export:
+      Name: !Sub '${AWS::StackName}-KMSKeyId'
+  
+  KMSKeyArn:
+    Value: !GetAtt EncryptionKey.Arn
+    Description: ARN de la KMS Key
+    Export:
+      Name: !Sub '${AWS::StackName}-KMSKeyArn'
+  
+  RawBucketName:
+    Value: !Ref RawImagesBucket
+    Description: Nombre del bucket RAW
+    Export:
+      Name: !Sub '${AWS::StackName}-RawBucket'
+  
+  ProcessedBucketName:
+    Value: !Ref ProcessedImagesBucket
+    Description: Nombre del bucket PROCESSED
+    Export:
+      Name: !Sub '${AWS::StackName}-ProcessedBucket'
+  
+  DynamoDBTableName:
+    Value: !Ref GadgetImagesTable
+    Description: Nombre de la tabla DynamoDB
+    Export:
+      Name: !Sub '${AWS::StackName}-DynamoDBTable'
+  
+  ImageProcessorLambdaArn:
+    Value: !GetAtt ImageProcessorLambda.Arn
+    Description: ARN de la Lambda procesadora
+    Export:
+      Name: !Sub '${AWS::StackName}-ProcessorLambda'
+  
+  ApiHandlerLambdaArn:
+    Value: !GetAtt ApiHandlerLambda.Arn
+    Description: ARN de la Lambda del API
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiLambda'
+  
+  UserPoolId:
+    Value: !Ref UserPool
+    Description: ID del Cognito User Pool
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolId'
+  
+  UserPoolClientId:
+    Value: !Ref UserPoolClient
+    Description: ID del Cognito User Pool Client
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolClientId'
+  
+  UserPoolDomain:
+    Value: !Ref UserPoolDomain
+    Description: Dominio del Cognito User Pool
+    Export:
+      Name: !Sub '${AWS::StackName}-UserPoolDomain'
+  
+  ApiUrl:
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentName}'
+    Description: URL base del API Gateway
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiUrl'
+  
+  ApiId:
+    Value: !Ref RestApi
+    Description: ID del API Gateway
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiId'

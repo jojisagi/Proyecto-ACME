@@ -1,0 +1,101 @@
+{
+  "toons": [
+    {
+      "toonId": "TOON-IMG-001",
+      "type": "IMAGE",
+      "payload": {
+        "url": "https://picsum.photos/1920/1080",
+        "width": 1920,
+        "height": 1080,
+        "format": "jpeg",
+        "metadata": {
+          "camera": "Canon EOS R5",
+          "iso": 400,
+          "aperture": "f/2.8"
+        }
+      }
+    },
+    {
+      "toonId": "TOON-IMG-002",
+      "type": "IMAGE",
+      "payload": {
+        "url": "https://picsum.photos/800/600",
+        "width": 800,
+        "height": 600,
+        "format": "png",
+        "metadata": {
+          "hasAlpha": true,
+          "colorSpace": "sRGB"
+        }
+      }
+    },
+    {
+      "toonId": "TOON-VID-001",
+      "type": "VIDEO",
+      "payload": {
+        "url": "https://example.com/sample-video.mp4",
+        "duration": 180,
+        "resolution": "1080p",
+        "codec": "h264",
+        "bitrate": 5000,
+        "fps": 30
+      }
+    },
+    {
+      "toonId": "TOON-VID-002",
+      "type": "VIDEO",
+      "payload": {
+        "url": "https://example.com/short-clip.mp4",
+        "duration": 15,
+        "resolution": "720p",
+        "codec": "h265",
+        "bitrate": 2500,
+        "fps": 60
+      }
+    },
+    {
+      "toonId": "TOON-TXT-001",
+      "type": "TEXT",
+      "payload": {
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "language": "la",
+        "wordCount": 19,
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "toonId": "TOON-DOC-001",
+      "type": "DOCUMENT",
+      "payload": {
+        "url": "https://example.com/report.pdf",
+        "pages": 25,
+        "size": 5242880,
+        "format": "pdf",
+        "hasImages": true,
+        "hasTables": true
+      }
+    },
+    {
+      "toonId": "TOON-DOC-002",
+      "type": "DOCUMENT",
+      "payload": {
+        "url": "https://example.com/presentation.pptx",
+        "pages": 15,
+        "size": 10485760,
+        "format": "pptx",
+        "slideCount": 15
+      }
+    },
+    {
+      "toonId": "TOON-AUDIO-001",
+      "type": "AUDIO",
+      "payload": {
+        "url": "https://example.com/podcast.mp3",
+        "duration": 3600,
+        "bitrate": 320,
+        "format": "mp3",
+        "sampleRate": 44100
+      }
+    }
+  ]
+}

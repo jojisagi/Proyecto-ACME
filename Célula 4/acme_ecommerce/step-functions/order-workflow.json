@@ -1,0 +1,113 @@
+{
+  "Comment": "Order Processing Workflow - Orchestrates payment, shipment, and notifications",
+  "StartAt": "ProcessPayment",
+  "States": {
+    "ProcessPayment": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:process-order",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "action": "process_payment"
+      },
+      "ResultPath": "$.paymentResult",
+      "Next": "PaymentSuccessful",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed",
+            "States.Timeout"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "PaymentFailed"
+        }
+      ]
+    },
+    "PaymentSuccessful": {
+      "Type": "Pass",
+      "Comment": "Payment processed successfully",
+      "Next": "ArrangeShipment"
+    },
+    "ArrangeShipment": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:process-order",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "action": "arrange_shipment"
+      },
+      "ResultPath": "$.shipmentResult",
+      "Next": "SendNotification",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed",
+            "States.Timeout"
+          ],
+          "IntervalSeconds": 3,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "ShipmentFailed"
+        }
+      ]
+    },
+    "SendNotification": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:process-order",
+      "Parameters": {
+        "orderId.$": "$.orderId",
+        "action": "send_notification"
+      },
+      "ResultPath": "$.notificationResult",
+      "Next": "OrderCompleted",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 2,
+          "BackoffRate": 1.5
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "NotificationFailed"
+        }
+      ]
+    },
+    "OrderCompleted": {
+      "Type": "Succeed",
+      "Comment": "Order processing completed successfully"
+    },
+    "PaymentFailed": {
+      "Type": "Fail",
+      "Error": "PaymentProcessingError",
+      "Cause": "Payment processing failed after retries"
+    },
+    "ShipmentFailed": {
+      "Type": "Fail",
+      "Error": "ShipmentArrangementError",
+      "Cause": "Shipment arrangement failed"
+    },
+    "NotificationFailed": {
+      "Type": "Pass",
+      "Comment": "Notification failed but order is still valid",
+      "Next": "OrderCompleted"
+    }
+  }
+}

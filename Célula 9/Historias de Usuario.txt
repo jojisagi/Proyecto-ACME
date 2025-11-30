@@ -1,0 +1,23 @@
+HU-9.1 – Registrar nuevo vehículo
+
+Como diseñador de gadgets
+Quiero crear un nuevo vehículo
+Para agregarlo al catálogo interno.
+
+HU-9.2 – Consultar todos los vehículos
+
+Como usuario autorizado
+Quiero ver la lista de vehículos
+Para administrarlos.
+
+HU-9.3 – Editar gadget
+
+Como diseñador
+Quiero actualizar especificaciones
+Para mantener los datos al día.
+
+HU-9.4 – Eliminar vehículo
+
+Como administrador
+Quiero borrar gadgets obsoletos
+Para mantener un catálogo limpio.

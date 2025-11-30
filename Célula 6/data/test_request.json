@@ -1,0 +1,30 @@
+{
+  "description": "Request de prueba para enviar a POST /submit-job",
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "jobId": "JOB-TEST-001",
+    "toons": [
+      {
+        "toonId": "TOON-001",
+        "type": "IMAGE",
+        "payload": {
+          "url": "https://example.com/test-image.jpg",
+          "width": 1024,
+          "height": 768
+        }
+      },
+      {
+        "toonId": "TOON-002",
+        "type": "VIDEO",
+        "payload": {
+          "url": "https://example.com/test-video.mp4",
+          "duration": 30
+        }
+      }
+    ]
+  },
+  "curl_example": "curl -X POST https://API_ENDPOINT/dev/submit-job -H 'Authorization: Bearer YOUR_JWT_TOKEN' -H 'Content-Type: application/json' -d @data/test_request.json"
+}

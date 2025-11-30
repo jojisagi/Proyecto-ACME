@@ -1,0 +1,86 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing dependencies..."
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+      
+  pre_build:
+    commands:
+      - echo "Running tests and validation..."
+      - echo "Running unit tests..."
+      - pytest tests/unit/ --cov=src --cov-report=term --cov-report=html --cov-report=xml --junitxml=pytest-report.xml -v
+      - echo "Running property-based tests..."
+      - pytest tests/property/ -v
+      - echo "Linting CloudFormation templates..."
+      - python -m cfnlint iac/*.yml
+      - echo "Validating CloudFormation templates..."
+      - python validate_cfn.py
+      - python validate_pipeline.py
+      
+  build:
+    commands:
+      - echo "Packaging Lambda functions..."
+      - mkdir -p build/lambdas
+      - |
+        for lambda_dir in src/lambdas/*/; do
+          if [ -d "$lambda_dir" ] && [ "$(basename "$lambda_dir")" != "__pycache__" ]; then
+            lambda_name=$(basename "$lambda_dir")
+            echo "Packaging $lambda_name..."
+            cd "$lambda_dir"
+            zip -r "../../../build/lambdas/${lambda_name}.zip" . -x "*.pyc" -x "__pycache__/*" -x "*.pyo" -x "tests/*"
+            cd -
+          fi
+        done
+      - echo "Copying CloudFormation templates to build directory..."
+      - mkdir -p build/iac
+      - cp iac/*.yml build/iac/
+      
+  post_build:
+    commands:
+      - echo "Build completed on $(date)"
+      - echo "Generating test coverage report..."
+      - |
+        if [ -f "coverage.xml" ]; then
+          echo "Coverage report generated: coverage.xml"
+        fi
+      - |
+        if [ -d "htmlcov" ]; then
+          echo "HTML coverage report generated in htmlcov/"
+        fi
+      - echo "Lambda packages created:"
+      - ls -lh build/lambdas/
+      - echo "CloudFormation templates copied:"
+      - ls -lh build/iac/
+
+artifacts:
+  files:
+    - 'build/**/*'
+  name: cartoon-rekognition-artifacts-$(date +%Y%m%d-%H%M%S)
+  secondary-artifacts:
+    lambda_artifacts:
+      files:
+        - 'build/lambdas/**/*'
+      name: lambda-functions
+    cfn_artifacts:
+      files:
+        - 'build/iac/**/*'
+      name: cloudformation-templates
+
+reports:
+  pytest_reports:
+    files:
+      - 'pytest-report.xml'
+    file-format: JUNITXML
+  coverage_reports:
+    files:
+      - 'coverage.xml'
+    file-format: COBERTURAXML
+
+cache:
+  paths:
+    - '/root/.cache/pip/**/*'
